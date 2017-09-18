@@ -1,0 +1,9 @@
+beatmania controller
+bt1	button 1	1	BUTTON	3	0	0.0	0.0
+bt2	button 2	1	BUTTON	6	0	0.0	0.0
+bt3	button 3	1	BUTTON	2	0	0.0	0.0
+bt4	button 4	1	BUTTON	7	0	0.0	0.0
+bt5	button 5	1	BUTTON	1	0	0.0	0.0
+scr	scratch	3	SLIDER	y	0	1.0	0.0
+sta	start	1	BUTTON	8	0	0.0	0.0
+sel	select	1	BUTTON	9	0	0.0	0.0
