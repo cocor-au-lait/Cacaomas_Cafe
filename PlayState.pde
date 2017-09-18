@@ -19,6 +19,8 @@ class PlayState extends State {
     int flash_index[];      // 次に使用されるフラッシュカウンタのインデックス
     int flash_count[][];    // フラッシュ６ｘ３個分のカウンタ
     int back_key_count[];   // キーを離した時の後ろのバックライトの演出用カウンタ
+    int judge_count;        // 判定画像用演出カウンタ
+    int near_judge_count;   // fast,slow演出カウンタ
 
     BigDecimal highspeed = new BigDecimal("2.5");    // 譜面のスクロールスピード
     long adjust = -170;    // 判定調節用（+に行くほど判定が早めになる）
@@ -32,6 +34,7 @@ class PlayState extends State {
     boolean isFinish;
     PImage test[];
     int test_judge;
+    int near;
     int obj_num;
     double obj_score, display_score, pre_score;
     float obj_gauge, display_gauge, pre_gauge;
@@ -73,10 +76,12 @@ class PlayState extends State {
 
         // ゲーム用変数の初期化
         scr_multi = 1.0f;
+        /*
         elapsed_time = 0;
         game_start_time = 0;
         elapsed_time = 0;
         image_id = 0;
+        */
         start_num = new int[1296];
         flash_index = new int[6];
         flash_count = new int[6][3];
@@ -216,6 +221,7 @@ class PlayState extends State {
                         test_judge = 0;
                         score_data.addPoor();
                         score_data.addGauge(-2.0);
+                        judge_count = 30;
                         // 判定オブジェをその次からに変更
                         start_num[j + 0x11 + 0x20] = i + 1;
                         // 次のオブジェをチェック
@@ -231,13 +237,7 @@ class PlayState extends State {
                     if(press[j]) {
                         // キーを押した瞬間なら精度判定
                         long sub = now_count - bms_data.data_time + adjust;       // オブジェとの差を絶対値で取得
-                        int near = 0;
-                        if(sub < 0) {
-                            near = 1;
-                        }
-                        else if (sub > 0) {
-                            near = -1;
-                        }
+                        near = sub < 0? 1 : -1;         //sub < 0でfast
                         sub = (long)abs(sub);
 
                         int press_judge = 0;
@@ -284,6 +284,8 @@ class PlayState extends State {
                             start_num[index[j] + 0x11 + 0x20]++;
                             // フラッシュ開始
                             flash_count[index[j]][ flash_index[index[j]] ] = 45;
+                            // 判定描画開始
+                            judge_count = 30;
                             // 次のインデックスへ
                             flash_index[index[j]]++;
                             if( flash_index[index[j]] > 2 ) {
@@ -335,7 +337,7 @@ class PlayState extends State {
             highspeed = highspeed.subtract(new BigDecimal("0.1"));
         }
 
-        // スコア（暫定）
+        // スコア
         if(score_data.getScore() != display_score) {
             display_score += lerp(0, (float)(score_data.getScore() - display_score), 0.5);
         }
@@ -345,14 +347,14 @@ class PlayState extends State {
         text("SCORE", 20, 50);
         text(nf((int)(ceil((float)display_score)), 8), 20, 90);
 
-        // 情報（暫定）
+        // 情報
         fill(0);
         textSize(25);
         text("maxcombo:" + score_data.getMaxCombo(), 20, 120);
         text("bpm:" + (int)bms.bms_header.bpm, 20, 150);
         text("highspeed:x" + highspeed, 20, 180);
 
-        // リアルタイムジャッジ（暫定）
+        // リアルタイムジャッジ
         textAlign(RIGHT);
         text("combo:" + score_data.getCombo(), 150, 220);
         text("perfect:" + score_data.getPerfect(), 150, 250);
@@ -401,7 +403,7 @@ class PlayState extends State {
         // キーのバックライト演出
         blendMode(ADD);         // 加算合成
         imageMode(CENTER);
-        for(int i = 0; i < 6; i++) {
+        for(int i = 0; i < back_key_count.length; i++) {
             if(back_key_count[i] > 0) {
                 tint( #FFFFFF, 255 * (float)back_key_count[i] /   10.0f);     // 徐々にフェードアウト
                 image(parts[4 + obj_kind[i]], obj_x[i], 395);                                        // レーンの種類ごとにバックライト画像を表示
@@ -410,8 +412,8 @@ class PlayState extends State {
 
 
         // フラッシュ表示
-        for(int i = 0; i < 6; i++) {
-            for(int j = 0; j < 3; j++) {
+        for(int i = 0; i < flash_count.length; i++) {
+            for(int j = 0; j < flash_count[i].length; j++) {
                 if(flash_count[i][j] > 0) {
                     // 演出が存在する場合のみ表示
                     float alpha = cos( flash_count[i][j] * 2 * PI / 180);
@@ -423,44 +425,64 @@ class PlayState extends State {
             }
         }
 
+        // 判定画像（暫定）
+        if(judge_count > 0) {
+            blendMode(BLEND);
+            noTint();
+            textAlign(CENTER);
+            textSize(30);
+            String message;
+            if(near > 0) {
+                message = new String("fast");
+                fill(50, 50, 230);
+            } else {
+                message = new String("slow");
+                fill(230, 50, 50);
+            }
+
+            switch(test_judge) {
+                case 0:     //poor
+                    image(test[0], width/2, height/2);
+                    break;
+                case 1:     //bad
+                    image(test[1], width/2, height/2);
+                    text(message, width / 2, 600);
+                    break;
+                case 2:     //good
+                    image(test[2], width/2, height/2);
+                    text(message, width / 2, 600);
+                    break;
+                case 3:     //great
+                    image(test[3], width/2, height/2);
+                    text(message, width / 2, 600);
+                    break;
+                case 4:     //perfect
+                    image(test[4], width/2, height/2);
+                    break;
+            }
+        }
+
         // 60FPSでのデータ操作
         int lp = tm.runTimer();
         for(int h = 0; h < lp; h++) {
             // 後ろのバックライト演出
-            for(int i = 0; i < 6; i++) {
+            for(int i = 0; i < back_key_count.length; i++) {
                 if(back_key_count[i] > 0) {
                     back_key_count[i]--;
                 }
             }
             // フラッシュ部
-            for( int i = 0; i < 6; i++ ) {
-                for( int j = 0; j < 3; j++ ) {
+            for( int i = 0; i < flash_count.length; i++ ) {
+                for( int j = 0; j < flash_count[i].length; j++ ) {
                     if( flash_count[i][j] > 0 ) {
                         flash_count[i][j] -= 3;
                     }
                 }
             }
-        }
-
-        // 判定画像（暫定）
-        noTint();
-        blendMode(BLEND);
-        switch(test_judge) {
-            case 0:
-                image(test[0], width/2, height/2);
-                break;
-            case 1:
-                image(test[1], width/2, height/2);
-                break;
-            case 2:
-                image(test[2], width/2, height/2);
-                break;
-            case 3:
-                image(test[3], width/2, height/2);
-                break;
-            case 4:
-                image(test[4], width/2, height/2);
-                break;
+            // 判定画像
+            if(judge_count > 0) {
+                judge_count--;
+            }
         }
     }
 

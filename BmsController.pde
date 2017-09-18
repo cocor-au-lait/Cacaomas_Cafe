@@ -15,10 +15,11 @@ public class BmsController {
     private BmsData[][] bms_data;          // 実データ[ch][data]
     private int[] num_bms_data;            // 実データのそれぞれの数
 
-    private String wav_file[];            // WAVのファイル名
-    private String bmp_file[];            // BMPのファイル名
+    private String[] wav_file;            // WAVのファイル名
+    private String[] bmp_file;            // BMPのファイル名
 
     public BmsController() {
+        // 変数の初期化
         bms_header = new BmsHeader();
         bms_header.bpmindex = new float[1001];
         bms_data = new BmsData[256][1296];
