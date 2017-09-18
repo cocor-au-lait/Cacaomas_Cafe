@@ -1,6 +1,7 @@
 # タイトル名「Coffee Music（仮）」
 ### **「音楽に合わせて美味しいコーヒーを作ろう」**
-未来のバリスタになるために…
+未来のバリスタになるために…  
+##### *鋭意製作中*
 ## イメージ画像
 ![title](https://github.com/juncocoa0731/Cacaomas_Cafe/blob/master/readme/title.png)
 ![play](https://github.com/juncocoa0731/Cacaomas_Cafe/blob/master/readme/play.png)
