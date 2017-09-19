@@ -31,7 +31,7 @@ private boolean now_loading;
 private PApplet applet;
 // 各画面のスーパークラス
 private State state;
-private Connect connect;
+private StateConnect connect;
 private Thread thread;
 
 public void setup() {
