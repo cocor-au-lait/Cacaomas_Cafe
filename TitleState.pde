@@ -13,6 +13,9 @@ public class TitleState extends State {
         bgm.loop();
         stateMove = new StateMove();
     }
+    
+    public void loadingState() {
+    }
 
     public void drawState() {
         // 背景
@@ -33,14 +36,6 @@ public class TitleState extends State {
             stateMove = new StateMove();
             phase = 2;
         }
-    }
-
-    public void openState() {
-        stateMove.riseScene();
-    }
-
-    public void closeState() {
-        stateMove.fallScene();
     }
 
     public State nextState() {

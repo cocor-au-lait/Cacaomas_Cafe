@@ -14,6 +14,9 @@ public class DecideState extends State {
         decide = minim.loadSample("sound/se/decide.mp3");
         decide.trigger();
     }
+    
+    public void loadingState() {
+    }
 
     public void drawState() {
         imageMode(CORNER);

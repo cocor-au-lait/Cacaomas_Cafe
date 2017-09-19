@@ -120,7 +120,9 @@ class PlayState extends State {
 
         // 現在の時間を開始時間とする
         game_start_time = System.nanoTime();
-        isLoading = false;
+    }
+
+    public void loadingState() {
     }
 
     void drawState() {

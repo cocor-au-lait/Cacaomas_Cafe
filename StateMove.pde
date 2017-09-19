@@ -4,7 +4,7 @@ public class StateMove {
 
     public StateMove() {
         start_time = millis();
-        controlable = false;
+        //controlable = false;
         noStroke();
     }
 
@@ -27,8 +27,8 @@ public class StateMove {
         rect(width * ratio, height / 6 * 5, width, height / 6);
 
         if(millis() - start_time > 1000) {
-            controlable = true;
-            phase = 1;
+            //controlable = true;
+            //phase = 1;
         }
     }
 
@@ -51,7 +51,7 @@ public class StateMove {
         rect(width * (1f - ratio), height / 6 * 5, width, height / 6);
 
         if(millis() - start_time > 3000) {
-            phase = 3;
+            //phase = 3;
         }
     }
 
@@ -64,8 +64,8 @@ public class StateMove {
         rect(0, 0, width, height);
 
         if(millis() - start_time > time) {
-            phase = 1;
-            controlable = true;
+            //phase = 1;
+            //controlable = true;
         }
     }
 
@@ -78,7 +78,7 @@ public class StateMove {
         rect(0, 0, width, height);
 
         if(millis() - start_time > time) {
-            phase = 3;
+            //phase = 3;
         }
     }
 }

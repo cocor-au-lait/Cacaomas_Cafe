@@ -6,6 +6,9 @@ public class ResultState extends State {
         this.score_data = score_data;
         this.bms_header = bms_header;
     }
+    
+    public void loadingState() {
+    }
 
     public void drawState() {
         clear();
@@ -32,14 +35,6 @@ public class ResultState extends State {
         text("poor:" + score_data.getPoor(), 20, 370);
         text("fast:" + score_data.getfast(), 20, 420);
         text("slow:" + score_data.getSlow(), 20, 450);
-    }
-
-    public void openState() {
-        stateMove.fadeOut(1000);
-    }
-
-    public void closeState() {
-        stateMove.fallScene();
     }
 
     public State nextState() {

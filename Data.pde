@@ -1,7 +1,3 @@
-public class Data {
-
-}
-
 public class ScoreData {
     private boolean clear;
     private boolean fullcombo;

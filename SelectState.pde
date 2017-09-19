@@ -7,6 +7,9 @@ class SelectState extends State {
         bgm = minim.loadFile("sound/bgm/hanyo.mp3");
         bgm.loop();
     }
+    
+    public void loadingState() {
+    }
 
     void drawState() {
         imageMode(CORNER);
@@ -19,14 +22,6 @@ class SelectState extends State {
             stateMove = new StateMove();
             phase = 2;
         }
-    }
-
-    void openState() {
-        stateMove.riseScene();
-    }
-
-    void closeState() {
-        phase = 3;
     }
 
     State nextState() {
