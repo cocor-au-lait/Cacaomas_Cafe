@@ -127,3 +127,11 @@ public class ScoreData {
         }
     }
 }
+
+public class PlayerData {
+
+}
+
+public class SongData {
+    
+}

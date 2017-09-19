@@ -32,10 +32,6 @@ private PApplet applet;
 // 各画面のスーパークラス
 private State state;
 
-// デバック用関数 //////////////////////////////
-protected FPS fps;
-/////////////////////////////////////////////
-
 public void setup() {
     // MacBook Pro 13インチのデフォルトより1段階低い解像度
     size(1280, 800, P2D);

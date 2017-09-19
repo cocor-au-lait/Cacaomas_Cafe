@@ -1,5 +1,0 @@
-class Fade {
-Fade() {
-}
-
-}
