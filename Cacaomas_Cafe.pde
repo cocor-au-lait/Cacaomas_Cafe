@@ -31,6 +31,8 @@ private boolean now_loading;
 private PApplet applet;
 // 各画面のスーパークラス
 private State state;
+private Connect connect;
+private Thread thread;
 
 public void setup() {
     // MacBook Pro 13インチのデフォルトより1段階低い解像度
@@ -44,6 +46,8 @@ public void setup() {
 }
 
 public void draw() {
-    // 動作は各クラス側で行う
+    // 各ステートにおける動作、描画
     state = state.doState();
+    // 各ステート間のつなぎの描画
+    connect.connectionDraw();
 }

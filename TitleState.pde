@@ -5,15 +5,9 @@ public class TitleState extends State {
     private PImage wallpaper, logo;
 
     public TitleState() {
-        main_str = new String("pless ENTER/START key to start");
-        bgm = minim.loadFile("sound/bgm/title.mp3");
-        se = minim.loadSample("sound/se/enter.mp3");
-        wallpaper = loadImage("image/background/title.png");
-        logo = loadImage("image/parts/title_logo.png");
-        bgm.loop();
-        stateMove = new StateMove();
+
     }
-    
+
     public void loadingState() {
     }
 
@@ -43,5 +37,18 @@ public class TitleState extends State {
         se.close();
         minim.stop();
         return new SelectState();
+    }
+}
+
+// バックグラウンド処理はこちら側に書く
+public class TitleThread extends Thread {
+    public void run() {
+        main_str = new String("pless ENTER/START key to start");
+        bgm = minim.loadFile("sound/bgm/title.mp3");
+        se = minim.loadSample("sound/se/enter.mp3");
+        wallpaper = loadImage("image/background/title.png");
+        logo = loadImage("image/parts/title_logo.png");
+        bgm.loop();
+        stateMove = new StateMove();
     }
 }

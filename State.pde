@@ -6,10 +6,6 @@ public abstract class State{
     protected int start_time;
     protected int elapsed_time;
 
-    public State() {
-        fps = new FPS(60);
-    }
-
     public State doState() {
         elapsed_time = millis() - start_time;
         // 画面描画アニメーション

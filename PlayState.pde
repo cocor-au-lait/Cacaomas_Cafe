@@ -7,7 +7,7 @@ class PlayState extends State {
     static final long POOR_RANGE = 9600 / 2;       // POOR判定する中心からの範囲(前後合わせて1小節内)
     static final int BASE_SPEED = 400;
 
-    BmsTimer tm = new BmsTimer();
+    FrameTimer tm = new FrameTimer();
 
     float scr_multi;        // 小節間の幅の倍率
     long game_start_time;   // ゲーム開始時の時間(高解像度タイマー)
@@ -465,8 +465,9 @@ class PlayState extends State {
         }
 
         // 60FPSでのデータ操作
-        int lp = tm.runTimer();
-        for(int h = 0; h < lp; h++) {
+        int diff_frame = tm.runTimer();         //前回runTimerで呼び出してから何フレーム分進んだか
+        //進んだフレーム文処理を行う
+        for(int h = 0; h < diff_frame; h++) {
             // 後ろのバックライト演出
             for(int i = 0; i < back_key_count.length; i++) {
                 if(back_key_count[i] > 0) {
