@@ -18,9 +18,12 @@ public abstract class State{
         controlable = doTransition() ? false : true;
         elapsed_time = millis() - start_time;
         // 画面描画アニメーション
-        drawState();
+        if(transition.trans_phase != 3) {
+            drawState();
+        }
         // transInが完了したら次のステートのイニシャライズを開始する
-        if(canMoveToNextState()) {
+        if(canMoveToNextState() && !initializing) {
+            transition.trans_phase = 3;
             return nextState();
         }
 
