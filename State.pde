@@ -1,40 +1,32 @@
 public abstract class State{
     protected int select;             // 画面で選んでる項目
-    protected Thread thread;
     protected int phase;                          // 0:open 1:stay 2:close 3:move
     protected boolean controlable;                // 操作の制御
     protected int start_time;
     protected int elapsed_time;
+    // 各Stateの初期化子が実行されているか
+    protected boolean initializing;
+
+    public State() {
+        initializing = true;
+    }
 
     public State doState() {
+        if(initializing) {
+            initializing = false;
+        }
+        controlable = doTransition() ? false : true;
         elapsed_time = millis() - start_time;
         // 画面描画アニメーション
-        if(now_loading) {
-            loadingState();
-        } else {
-            // キーボードとコントローラーの監視
-            keyControll();
-            drawState();
+        drawState();
+        // transInが完了したら次のステートのイニシャライズを開始する
+        if(canMoveToNextState()) {
+            return nextState();
         }
-        //状況に応じて上書き描画
-        /*
-        switch(phase) {
-            case 0:    //open
-                openState();
-                break;
-            case 2:    //close
-                closeState();
-                break;
-            case 3:    //move
-                closeState();
-                return nextState();
-        }
-        */
 
         return this;
     }
 
-    public abstract void loadingState();        // ロード中の描画を行う
     public abstract void drawState();           // メインの描画を行う
     public abstract State nextState();          // 次の画面を呼び出す
 
@@ -123,6 +115,9 @@ public abstract class State{
     }
 
     public void keyControll() {
+        if(!controlable) {
+            return;
+        }
         //キーの処理
         press = new boolean[8];
 

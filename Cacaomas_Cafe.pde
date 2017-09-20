@@ -26,13 +26,12 @@ private Minim minim;
 private StateMove stateMove;
 // 譜面ファイル制御クラス
 private BmsController bms;
-// スレッド終了判定フラグ
-private boolean now_loading;
+// 別Statedでアプレットを読み込むための変数
 private PApplet applet;
 // 各画面のスーパークラス
 private State state;
-private StateConnect connect;
-private Thread thread;
+// 画面切り替えの際のオーバーレイクラス
+private StateTransition transition;
 
 public void setup() {
     // MacBook Pro 13インチのデフォルトより1段階低い解像度
@@ -43,11 +42,12 @@ public void setup() {
     pixelDensity(2); //retinaに対応
     //noCursor();
     state = new SetupState(this);
+    transition = new StateTransition(this);
 }
 
 public void draw() {
     // 各ステートにおける動作、描画
     state = state.doState();
     // 各ステート間のつなぎの描画
-    connect.connectionDraw();
+    transition.transitionDraw();
 }
