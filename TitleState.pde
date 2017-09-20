@@ -4,15 +4,19 @@ public class TitleState extends State {
     private AudioSample se;
     private PImage wallpaper, logo;
 
-    public TitleState() {
-        main_str = new String("pless ENTER/START key to start");
-        bgm = minim.loadFile("sound/bgm/title.mp3");
-        se = minim.loadSample("sound/se/enter.mp3");
-        wallpaper = loadImage("image/background/title.png");
-        logo = loadImage("image/parts/title_logo.png");
-        bgm.loop();
-    }
+    private String init_order =
+    {"main_str = new String(\"pless ENTER/START key to start\");
+    bgm = minim.loadFile(\"sound/bgm/title.mp3\");
+    se = minim.loadSample(\"sound/se/enter.mp3\");
+    wallpaper = loadImage(\"image/background/title.png\");
+    logo = loadImage(\"image/parts/title_logo.png\");
+    bgm.loop();
+    initializing = false;"}
 
+    public TitleState() {
+
+    }
+    
     public void drawState() {
         // 背景
         imageMode(CORNER);
@@ -24,9 +28,10 @@ public class TitleState extends State {
 
         //各項目の描画
         textSize(40);
+        fill(255);
         text(main_str, width / 2, height * 0.8);
 
-        if(press[6]) {
+        if(press[6] && !doTransition()) {
             se.trigger();
             bgm.shiftGain(1, -80, 3000);
         }

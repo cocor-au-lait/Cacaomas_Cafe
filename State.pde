@@ -12,9 +12,9 @@ public abstract class State{
     }
 
     public State doState() {
-        if(initializing) {
+        /*if(initializing) {
             initializing = false;
-        }
+        }*/
         controlable = doTransition() ? false : true;
         elapsed_time = millis() - start_time;
         // 画面描画アニメーション

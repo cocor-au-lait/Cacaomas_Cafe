@@ -12,7 +12,7 @@ public void runTransition(String mode) {
     transition.resetAndStartTransition(mode);
 }
 
-public boolean isInitialize() {
+public boolean isInitializing() {
     return state.initializing;
 }
 

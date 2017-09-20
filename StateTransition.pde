@@ -1,11 +1,11 @@
-public class StateTransition {
+public class StateTransitionThread extends Thread {
     PApplet applet;
     private int start_time;
     private int elapsed_time;
     private String mode;
     private int trans_phase;
 
-    public StateTransition(PApplet applet) {
+    public StateTransitionThread(PApplet applet) {
         this.applet = applet;
     }
 
@@ -24,10 +24,11 @@ public class StateTransition {
     }
 
     public void transitionDraw() {
-        elapsed_time = millis() - start_time;
+        println(trans_phase);
         if(trans_phase <= 0) {
             return;
         }
+        elapsed_time = millis() - start_time;
         switch(mode) {
         case "SIMPLE":
         default:
@@ -40,20 +41,23 @@ public class StateTransition {
         float ratio = 0.0f;
         switch(trans_phase) {
         case 1:
-            ratio = elapsed_time / 1000.0f;
+            ratio = elapsed_time / 2000.0f;
             if(ratio > 1.0f) {
+                start_time = millis();
                 trans_phase = 2;
             }
             break;
         case 2:
             ratio = 1.0f;
-            if(!isInitialize()) {
+            if(!isInitializing()) {
+                start_time = millis();
                 trans_phase = 3;
             }
             break;
         case 3:
-            ratio = 1.0f - (elapsed_time / 1000.0f);
+            ratio = 1.0f - (elapsed_time / 2000.0f);
             if(ratio > 1.0f) {
+                start_time = millis();
                 trans_phase = 0;
             }
             break;
