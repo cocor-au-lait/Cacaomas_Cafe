@@ -4,7 +4,6 @@ public class SetupState extends State {
     public SetupState() {
         textFont(createFont("PrestigeEliteStd-Bd",70,true));
         textAlign(CENTER);
-        start_time = millis();
     }
 
     public void drawState() {
@@ -29,21 +28,15 @@ public class SetupState extends State {
     public State nextState() {
         return new TitleState();
     }
-}
 
-// バックグラウンド処理はこちら側に書く
-public class SetupThread extends Thread {
-    public SetupThread(PApplet p) {
-        applet = p;
-    }
-
+    // バックグラウンド処理はこちら側に書く
     public void run() {
         bms = new BmsController();
         minim = new Minim(applet);
         font = createFont("Georgia", 100);
-        bl_key_stat = new ArrayList<Boolean>();
+        key_status = new ArrayList<Boolean>();
         for(int i = 0; i < 8; i++) {
-            bl_key_stat.add(false);
+            key_status.add(false);
         }
         onKey = new boolean[8];
         press = new boolean[8];

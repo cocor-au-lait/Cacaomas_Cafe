@@ -1,28 +1,10 @@
-public class StateTransition {
-    private int start_time;
-    private int elapsed_time;
-    private String mode;
-    private int trans_phase;
+public class Transition1 extends Transiton {
     private int deg;
     private String dot = "...";
 
-    public int getPhase() {
-        return trans_phase;
-    }
-
-    public void setPhase(int trans_phase) {
-        this.trans_phase = trans_phase;
-    }
-
-    public void resetAndStartTransition(String mode) {
-        start_time = millis();
-        this.mode = mode;
-        trans_phase = 1;
-    }
-
     // 各ステート間のつなぎの描画
     public void drawTransition() {
-        if(trans_phase <= 0) {
+        if(status <= 0) {
             return;
         }
         elapsed_time = millis() - start_time;
@@ -36,7 +18,7 @@ public class StateTransition {
 
     public void simpleTransition() {
         float ratio = 0.0f;
-        switch(trans_phase) {
+        switch(status) {
         case 1:
             ratio = elapsed_time / 1200.0f;
             if(ratio > 1.0f) {
@@ -49,14 +31,14 @@ public class StateTransition {
             ratio = 1.0f;
             if(!isInitializing()) {
                 start_time = millis();
-                trans_phase = 4;
+                status = 4;
             }
             break;
         case 4:
             ratio = 1.0f - (elapsed_time / 1200.0f);
             if(ratio > 1.0f) {
                 start_time = millis();
-                trans_phase = 0;
+                status = 0;
             }
             break;
         }
