@@ -1,4 +1,4 @@
-public class InputeListner {
+public class InputListner {
     // ゲームパッド用パーツ用意
     ControlIO control;
     private ControlDevice device;
@@ -17,6 +17,20 @@ public class InputeListner {
         }
         onKey = new boolean[8];
         press = new boolean[8];
+        button = new ControlButton[8];
+        control = ControlIO.getInstance(applet);
+        device = control.getMatchedDeviceSilent("beatmania_gamepad");
+        if(device != null) {
+            button[0] = device.getButton("bt1");
+            button[1] = device.getButton("bt2");
+            button[2] = device.getButton("bt3");
+            button[3] = device.getButton("bt4");
+            button[4] = device.getButton("bt5");
+            button[5] = null;                       //本来はscratchが来る場所
+            button[6] = device.getButton("sta");
+            button[7] = device.getButton("sel");
+            scratch = device.getSlider("scr");
+        }
     }
 
     public void keyPressed() {

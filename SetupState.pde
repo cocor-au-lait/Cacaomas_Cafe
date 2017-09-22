@@ -29,6 +29,7 @@ public class SetupState extends State {
 
     // バックグラウンド処理はこちら側に書く
     public void run() {
+        listener = new InputListner();
         bms = new BmsController();
         minim = new Minim(applet);
         font = createFont("Georgia", 100);

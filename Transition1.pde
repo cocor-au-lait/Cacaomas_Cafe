@@ -1,4 +1,4 @@
-public class Transition1 extends Transiton {
+public class Transition1 extends Transition {
     private int deg;
     private String dot = "...";
 

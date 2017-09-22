@@ -5,19 +5,10 @@ public abstract class State implements Runnable {
     protected boolean initialize;
     protected boolean controllable;
 
-    // 音楽ファイルコア
-    private Minim minim;
-
     protected State() {
         initialize = true;
         Thread thread = new Thread(this);
         thread.start();
-        key_status = new ArrayList<Boolean>();
-        for(int i = 0; i < 8; i++) {
-            key_status.add(false);
-        }
-        onKey = new boolean[8];
-        press = new boolean[8];
         start_time = millis();
     }
 
@@ -42,7 +33,7 @@ public abstract class State implements Runnable {
             transition.trans_phase = 3;
             return nextState();
         }
-
+        // 画面の描画を続ける
         return this;
     }
 
