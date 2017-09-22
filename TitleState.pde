@@ -5,6 +5,11 @@ public class TitleState extends State {
     private PImage wallpaper, logo;
     private PImage[] aaa;
 
+    public void beforeState() {
+        start_time = millis();
+        bgm.loop();
+    }
+
     public void drawState() {
         // 背景
         imageMode(CORNER);
@@ -19,13 +24,13 @@ public class TitleState extends State {
         fill(255);
         text(main_str, width / 2, height * 0.8);
 
-        if(press[6] && !doTransition()) {
+        if(listener.press[6] && transition.isAlive()) {
             se.trigger();
             bgm.shiftGain(1, -80, 3000);
         }
     }
 
-    public State nextState() {
+    public State disposeState() {
         bgm.close();
         se.close();
         return new SelectState();
@@ -38,11 +43,5 @@ public class TitleState extends State {
         se = minim.loadSample("sound/se/enter.mp3");
         wallpaper = loadImage("image/background/title.png");
         logo = loadImage("image/parts/title_logo.png");
-        /*aaa = new PImage[500];
-        for(int i = 0; i < aaa.length; i++) {
-            aaa[i] = loadImage("image/parts/title_logo.png");
-        }*/
-        bgm.loop();
-        state.initializing = false;
     }
 }
