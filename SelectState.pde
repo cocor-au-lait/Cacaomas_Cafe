@@ -1,4 +1,4 @@
-public class SelectState extends State {
+class SelectState extends State {
     AudioPlayer bgm;
     PImage bg;
 
@@ -8,28 +8,25 @@ public class SelectState extends State {
         bgm.loop();
     }
     
-    public void beforeState() {
+    public void loadingState() {
     }
 
-    public void drawState() {
+    void drawState() {
         imageMode(CORNER);
         image(bg, 0 , 0, width, height);
         setText(50, 0, CORNER);
         textAlign(CORNER, TOP);
         text("select music", 50, 50);
 
-        if(listener.press[6]) {
-            //stateMove = new StateMove();
-            //phase = 2;
+        if(press[6]) {
+            stateMove = new StateMove();
+            phase = 2;
         }
     }
 
-    public State disposeState() {
+    State nextState() {
         bgm.close();
         minim.stop();
         return new DecideState();
-    }
-    
-    public void run() {
     }
 }

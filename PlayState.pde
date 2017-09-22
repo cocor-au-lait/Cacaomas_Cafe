@@ -1,4 +1,4 @@
-public class PlayState extends State {
+class PlayState extends State {
 
     static final long PERFECT_RANGE = 9600 / 48;      // PERFECTと判定する中心からの範囲(前後合わせて24分音符内)
     static final long GREAT_RANGE = 9600 / 32;      // GREATと判定する中心からの範囲(前後合わせて16分音符内)
@@ -51,7 +51,7 @@ public class PlayState extends State {
 
     SoundFile music[];
 
-    public PlayState() {
+    PlayState() {
         // BMSファイルのロード
         if(!bms.load("data/song/banana_ore/banana_ore.bms")) {
             println("BMSファイル読み込みエラー");
@@ -122,7 +122,7 @@ public class PlayState extends State {
         game_start_time = System.nanoTime();
     }
 
-    public void beforeState() {
+    public void loadingState() {
     }
 
     void drawState() {
@@ -144,8 +144,8 @@ public class PlayState extends State {
         if(bms.getMaxCount() + bms.BMS_RESOLUTION <= now_count) {
             //プレイが終了
             if(!isFinish) {
-                //stateMove = new StateMove();
-                //phase = 2;
+                stateMove = new StateMove();
+                phase = 2;
                 isFinish = true;
             }
         }
@@ -236,7 +236,7 @@ public class PlayState extends State {
                     }
 
                     // オブジェが判定内ならキーが押された瞬間かをチェック
-                    if(listener.press[j]) {
+                    if(press[j]) {
                         // キーを押した瞬間なら精度判定
                         long sub = now_count - bms_data.data_time + adjust;       // オブジェとの差を絶対値で取得
                         near = sub < 0? 1 : -1;         //sub < 0でfast
@@ -392,13 +392,13 @@ public class PlayState extends State {
 
         // 鍵盤のバックライト
         for(int i = 0; i < 5; i++) {
-            if(listener.onKey[i]) {
+            if(onKey[i]) {
                 // キーが押された状態ならカウンタをリセット
                 back_key_count[i] = 10;
             }
         }
         // スクラッチのバックライト
-        if(listener.scratch_status != 0) {
+        if(scratch_status != 0) {
             // 右か左に回している状態ならカウンタをリセット
             back_key_count[5] = 10;
         }
@@ -490,14 +490,14 @@ public class PlayState extends State {
     }
 
     void openState() {
-        //stateMove.fadeOut(1000);
+        stateMove.fadeOut(1000);
     }
 
     void closeState() {
-        //stateMove.fadeIn(1000);
+        stateMove.fadeIn(1000);
     }
 
-    public State disposeState() {
+    State nextState() {
         for(int i = 0; i < music.length; i++) {
             if(music[i] == null) {
                 continue;
@@ -506,8 +506,5 @@ public class PlayState extends State {
             music[i].dispose();
         }
         return new ResultState(score_data, bms.getHeader());
-    }
-    
-    public void run() {
     }
 }

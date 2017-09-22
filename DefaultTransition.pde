@@ -1,18 +1,11 @@
 public class DefaultTransition extends Transition {
     private int deg;
     private float ratio;
-    private static final int MIN_TIME = 1500; //3秒
-    private static final float FADE_TIME = 1000.0f;
-
-    public DefaultTransition() {
-    }
-
-    public DefaultTransition(int step) {
-        super.step = step;
-    }
+    private static final int min_time = 3000; //3秒
+    private statif final float fade_time = 1200.0f;
 
     public void firstDraw() {
-        ratio = step_elapsed_time / FADE_TIME;
+        ratio = step_elapsed_time / fade_time;
         if(ratio > 1.0f) {
             stepUp();
         }
@@ -21,14 +14,14 @@ public class DefaultTransition extends Transition {
 
     public void secondDraw() {
         ratio = 1.0f;
-        if(step_elapsed_time > MIN_TIME) {
-            stepUp();
+        if(thread.isAlive() && step_elapsed_time > min_time) {
+            stepup();
         }
         commonDraw();
     }
 
     public void thirdDraw() {
-        ratio = 1.0f - (step_elapsed_time / FADE_TIME);
+        ratio = 1.0f - (step_elapsed_time / fade_time);
         if(ratio < 0.0f) {
             stepUp();
         }
@@ -48,17 +41,16 @@ public class DefaultTransition extends Transition {
         fill(0, alpha);
         rect(0, 0, 200, 200);
         popMatrix();
-        deg = deg < 360 ? deg + 1 : 0;
-        String dot = new String();
+        deg = deg < 360 ? deg++ : 0;
         switch((int)(elapsed_time / 500) % 3) {
         case 0:
-            dot = new String(".");
+            String dot = new String(".");
             break;
         case 1:
-            dot = new String("..");
+            String dot = new String("..");
             break;
         case 2:
-            dot = new String("...");
+            String dot = new String("...");
             break;
         }
         textSize(30);

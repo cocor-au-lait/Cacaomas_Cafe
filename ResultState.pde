@@ -7,7 +7,7 @@ public class ResultState extends State {
         this.bms_header = bms_header;
     }
     
-    public void beforeState() {
+    public void loadingState() {
     }
 
     public void drawState() {
@@ -37,10 +37,7 @@ public class ResultState extends State {
         text("slow:" + score_data.getSlow(), 20, 450);
     }
 
-    public State disposeState() {
+    public State nextState() {
         return new SelectState();
-    }
-    
-    public void run() {
     }
 }

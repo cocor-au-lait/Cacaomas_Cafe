@@ -1,4 +1,4 @@
-public class InputListner implements Runnable {
+public class InputListner {
     // ゲームパッド用パーツ用意
     ControlIO control;
     private ControlDevice device;
@@ -9,14 +9,8 @@ public class InputListner implements Runnable {
     private boolean[] press;
     private int scratch_status;
     private ArrayList<Boolean> key_status;     //キーを覚える配列（同時押し用）
-    Thread init;
 
     public InputListner() {
-        init = new Thread(this);
-        init.start();
-    }
-
-    public void run() {
         key_status = new ArrayList<Boolean>();
         for(int i = 0; i < 8; i++) {
             key_status.add(false);
@@ -40,9 +34,6 @@ public class InputListner implements Runnable {
     }
 
     public void keyPressed() {
-        if(init.isAlive()) {
-            return;
-        }
         switch(keyCode) {
         case ESC:
             exit();
@@ -83,9 +74,6 @@ public class InputListner implements Runnable {
     }
 
     public void keyReleased() {
-        if(init.isAlive()) {
-            return;
-        }
         switch(keyCode) {
         case SHIFT:
             key_status.set(5, false);
@@ -124,9 +112,6 @@ public class InputListner implements Runnable {
     }
 
     public void keyControll() {
-        if(init.isAlive()) {
-            return;
-        }
         //キーの処理
         press = new boolean[8];
 

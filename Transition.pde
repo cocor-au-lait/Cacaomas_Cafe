@@ -1,30 +1,20 @@
 public abstract class Transition {
-    protected int start_time;
-    protected int step_start_time;
-    protected int elapsed_time;
-    protected int step_elapsed_time;
-    protected int step;     //0:turn up, 1:keep, 2:turn down, -1:dead
+    private int start_time;
+    private int step_start_time;
+    private int elapsed_time;
+    private int step_elapsed_time;
+    private String mode;
+    private int step;     //0:turn up, 1:keep, 2:turn down, -1:dead
 
     public Transition() {
-        step_start_time = millis();
         start_time = millis();
     }
 
     public void stepUp() {
-        if(step == 0) {
-            state = state.disposeState();
-        }
-        else if(step == 1) {
-            if(!state.finishInit()) {
-                return;
-            }
-            state.beforeState();
-        }
-        step = step == 2 ? -1 : step + 1;
         step_start_time = millis();
+        step = step == 2 ? -1 : step++;
     }
 
-    // ###メソッド名をわかりやすく変更
     public boolean isAlive() {
         return step >= 0 ? true : false;
     }
@@ -34,9 +24,6 @@ public abstract class Transition {
     }
 
     public void doTransition() {
-        if(step == -1) {
-            return;
-        }
         // 起動してからの経過時間（ms）
         elapsed_time = millis() - start_time;
         // 各ステータスに切り替わってからの経過時間（ms）
@@ -44,13 +31,15 @@ public abstract class Transition {
         switch(step) {
         case 0:
             firstDraw();
-            return;
+            break;
         case 1:
             secondDraw();
-            return;
+            break;
         case 2:
             thirdDraw();
-            return;
+            break;
+        default:
+            break;
         }
     }
 

@@ -12,7 +12,7 @@ public class EntryState extends State {
         println("\"rank\":" + db.getInt("rank"));
     }
     
-    public void beforeState() {
+    public void loadingState() {
     }
 
     public void drawState() {
@@ -20,17 +20,14 @@ public class EntryState extends State {
     }
 
     public void openState() {
-        //stateMove.riseScene();
+        stateMove.riseScene();
     }
 
     public void closeState() {
-        //stateMove.fallScene();
+        stateMove.fallScene();
     }
 
-    public State disposeState() {
+    public State nextState() {
         return new SelectState();
-    }
-    
-    public void run() {
     }
 }
