@@ -15,7 +15,7 @@ public class DecideState extends State {
         decide.trigger();
     }
     
-    public void loadingState() {
+    public void beforeState() {
     }
 
     public void drawState() {
@@ -28,23 +28,26 @@ public class DecideState extends State {
         textSize(40);
         text("chocolat au lait", width / 2, height / 2 + 40);
         if(millis() - t_start > 3000 && !flag) {
-            stateMove = new StateMove();
-            phase = 2;
+            //stateMove = new StateMove();
+            //phase = 2;
             flag = true;
         }
     }
 
     public void openState() {
-        phase = 1;
+        //phase = 1;
     }
 
     public void closeState() {
-        stateMove.fadeIn(1000);
+        //stateMove.fadeIn(1000);
     }
 
-    public State nextState() {
+    public State disposeState() {
         decide.close();
         minim.stop();
         return new PlayState();
+    }
+    
+    public void run() {
     }
 }

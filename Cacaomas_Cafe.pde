@@ -39,11 +39,11 @@ public void setup() {
     //noCursor();
     applet = this;
     state = new SetupState();
-    transition = new Transition1();
+    transition = new DefaultTransition(-1);
 }
 
 public void draw() {
     // 各ステートにおける動作、描画
-    state = state.doState();
+    state.doState();
     transition.doTransition();
 }

@@ -1,42 +1,35 @@
 public abstract class State implements Runnable {
-    protected boolean controllable;
     protected int start_time;
     protected int elapsed_time;
-    protected boolean initialize;
     protected boolean controllable;
+    protected Thread thread;
 
     protected State() {
-        initialize = true;
-        Thread thread = new Thread(this);
+        thread = new Thread(this);
         thread.start();
-        start_time = millis();
     }
 
-    // 他クラスで初期化子を実行しているかの判断に使用
-    public boolean isInitializing() {
-        return isInitializing;
+    public boolean finishInit() {
+        // スレッドが生きていればまだ初期化中ということ
+        return !thread.isAlive();
     }
 
     // ループ
-    public State doState() {
+    public void doState() {
+        if(transition.isCovered()) {
+            return;
+        }
+        // 此処より下はState画面が少しでも映る場合処理する
         if(controllable) {
             listener.keyControll();
         }
-        // 各画面での経過時間（ms）
+        // 各画面での経過時間の算出（ms）
         elapsed_time = millis() - start_time;
-        // ステートの描画が完全に見えないタイミングでは描画をしない
-        if(transition.getStatus() != 3) {
-            drawState();
-        }
-        // transInが完了したら次のステートのイニシャライズを開始する
-        if(canMoveToNextState() && !initializing) {
-            transition.trans_phase = 3;
-            return nextState();
-        }
-        // 画面の描画を続ける
-        return this;
+        // ステートの描画
+        drawState();
     }
 
+    public abstract void beforeState();            // 描画が始まる直前に開始する処理
     public abstract void drawState();           // メインの描画を行う
-    public abstract State nextState();          // 次の画面を呼び出す
+    public abstract State disposeState();       // Stateの後処理を行い次のStateで返す
 }
