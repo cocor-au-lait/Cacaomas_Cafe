@@ -12,13 +12,12 @@ private BmsController bms;
 private SQLite db;
 // フォント（暫定）
 private PFont font;
-// 音楽ファイルコア
-private Minim minim;
+
 // 各画面のスーパークラス
 private State state;
-
 private Transition transition;
-private PApplet applet = this;
+private InputeListner listener;
+private PApplet applet;
 
 
 public void setup() {
@@ -29,8 +28,10 @@ public void setup() {
     //fullScreen(P2D);
     pixelDensity(2); //retinaに対応
     //noCursor();
+    applet = this;
     state = new SetupState();
     transition = new Transition1();
+    listener = new InputListner();
 }
 
 public void draw() {

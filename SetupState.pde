@@ -7,9 +7,7 @@ public class SetupState extends State {
     }
 
     public void drawState() {
-        /*if(initializing) {
-            start_time = millis();
-        }*/
+        listener = new InputListner();
         text_alpha = (int)constrain(elapsed_time / 5.0 - 100, 0, 255);
         background(0);
         fill(255, text_alpha);
@@ -34,12 +32,6 @@ public class SetupState extends State {
         bms = new BmsController();
         minim = new Minim(applet);
         font = createFont("Georgia", 100);
-        key_status = new ArrayList<Boolean>();
-        for(int i = 0; i < 8; i++) {
-            key_status.add(false);
-        }
-        onKey = new boolean[8];
-        press = new boolean[8];
         //ゲームパッドの設定/////////////////////////////////////////////////////////////////////
         button = new ControlButton[8];
         control = ControlIO.getInstance(applet);

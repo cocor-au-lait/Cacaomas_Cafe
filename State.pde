@@ -3,6 +3,7 @@ public abstract class State implements Runnable {
     protected int start_time;
     protected int elapsed_time;
     protected boolean initialize;
+    protected boolean controllable;
 
     // 音楽ファイルコア
     private Minim minim;
@@ -27,6 +28,9 @@ public abstract class State implements Runnable {
 
     // ループ
     public State doState() {
+        if(controllable) {
+            listener.keyControll();
+        }
         // 各画面での経過時間（ms）
         elapsed_time = millis() - start_time;
         // ステートの描画が完全に見えないタイミングでは描画をしない
