@@ -8,9 +8,11 @@ import processing.sound.*;
 import org.gamecontrolplus.*;       // ゲームパッド用
 import de.bezier.data.sql.*;        // データベース用
 
+// 以下の変数は一度インスタンスするだけでいいためこちらに記述
 // 譜面ファイル制御クラス
-// ### Stateの中に移動させたほうがいいかも
 private BmsController bms;
+// データベース管理
+private SQLite db;
 // データベースprivate SQLite db;
 // ###加えて各ステートで使うフォントを読み込ませる
 private PFont font;
@@ -43,5 +45,5 @@ public void setup() {
 public void draw() {
     // 各ステートにおける動作、描画
     state = state.doState();
-    transition.drawTransition();
+    transition.doTransition();
 }

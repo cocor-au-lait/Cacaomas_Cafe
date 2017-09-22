@@ -1,21 +1,3 @@
-public boolean doTransition() {
-    boolean answer = transition.trans_phase != 0? true: false;
-    return answer;
-}
-
-public boolean canMoveToNextState() {
-    boolean answer = transition.trans_phase == 2? true: false;
-    return answer;
-}
-
-public void runTransition(String mode) {
-    transition.resetAndStartTransition(mode);
-}
-
-public boolean isInitializing() {
-    return state.initializing;
-}
-
 public void setText(int size, int col, int align) {
     textFont(font);  //設定したフォントを使用
     textSize(size);
