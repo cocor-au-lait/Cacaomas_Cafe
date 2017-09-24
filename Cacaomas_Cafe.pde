@@ -38,8 +38,7 @@ public void setup() {
     pixelDensity(2);    //retinaに対応
     //noCursor();
     applet = this;
-    state = new SetupState();
-    transition = new DefaultTransition(-1);
+    state = new SetupState();    
 }
 
 public void draw() {
