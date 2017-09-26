@@ -26,6 +26,8 @@ private Transition transition;
 private InputListner listener;
 // ###工夫をすればいらない関数かも
 private PApplet applet;
+// キーを覚える配列（同時押し用）
+private ArrayList<Boolean> key_status;
 
 public void setup() {
     // MacBook Pro 13インチのデフォルトより1段階低い解像度
@@ -38,11 +40,89 @@ public void setup() {
     pixelDensity(2);    //retinaに対応
     //noCursor();
     applet = this;
-    state = new SetupState();    
+    state = new SetupState();
 }
 
 public void draw() {
     // 各ステートにおける動作、描画
     state.doState();
     transition.doTransition();
+}
+// キーボードを押した時の処理（メインクラスでしか記述できないため）
+public void keyPressed() {
+    switch(keyCode) {
+    case ESC:
+        exit();
+    case SHIFT:
+        key_status.set(5, true);        //SCRATCH
+        break;
+    case ENTER:
+    case RETURN:
+        key_status.set(6, true);        //START
+        break;
+    case TAB:
+        key_status.set(7, true);       //SELECT
+        break;
+    }
+
+    switch(key) {
+    case 'c':
+    case 'C':
+        key_status.set(0, true);
+        break;
+    case 'v':
+    case 'V':
+        key_status.set(1, true);
+        break;
+    case 'b':
+    case 'B':
+        key_status.set(2, true);
+        break;
+    case 'n':
+    case 'N':
+        key_status.set(3, true);
+        break;
+    case 'm':
+    case 'M':
+        key_status.set(4, true);
+        break;
+    }
+}
+// キーボードを離した時の処理（メインクラスでしか記述できないため）
+public void keyReleased() {
+    switch(keyCode) {
+    case SHIFT:
+        key_status.set(5, false);
+        break;
+    case ENTER:
+    case RETURN:
+        key_status.set(6, false);          //START
+        break;
+    case TAB:
+        key_status.set(7, false);          //SELECT
+        break;
+    }
+
+    switch(key) {
+    case 'c':
+    case 'C':
+        key_status.set(0, false);
+        break;
+    case 'v':
+    case 'V':
+        key_status.set(1, false);
+        break;
+    case 'b':
+    case 'B':
+        key_status.set(2, false);
+        break;
+    case 'n':
+    case 'N':
+        key_status.set(3, false);
+        break;
+    case 'm':
+    case 'M':
+        key_status.set(4, false);
+        break;
+    }
 }

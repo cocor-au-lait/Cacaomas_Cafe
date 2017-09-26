@@ -10,8 +10,9 @@ public class EntryState extends State {
         println("\"highspeed\":" + db.getString("highspeed"));
         println("\"point\":" + db.getInt("point"));
         println("\"rank\":" + db.getInt("rank"));
+        db.close();
     }
-    
+
     public void beforeState() {
     }
 
@@ -30,7 +31,7 @@ public class EntryState extends State {
     public State disposeState() {
         return new SelectState();
     }
-    
+
     public void run() {
     }
 }

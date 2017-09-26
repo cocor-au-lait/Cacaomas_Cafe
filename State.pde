@@ -19,6 +19,9 @@ public abstract class State implements Runnable {
         if(transition.isCovered()) {
             return;
         }
+        if(finishInit()) {
+            controllable = true;
+        }
         // 此処より下はState画面が少しでも映る場合処理する
         if(controllable) {
             listener.keyControll();

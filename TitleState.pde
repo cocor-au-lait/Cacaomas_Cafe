@@ -24,9 +24,11 @@ public class TitleState extends State {
         fill(255);
         text(main_str, width / 2, height * 0.8);
 
-        if(listener.press[6] && transition.isAlive()) {
+        if(listener.press[6] && !transition.isAlive()) {
             se.trigger();
             bgm.shiftGain(1, -80, 3000);
+            transition = new DefaultTransition();
+            controllable = false;
         }
     }
 

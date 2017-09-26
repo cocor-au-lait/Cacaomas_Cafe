@@ -1,4 +1,4 @@
-public class InputListner implements Runnable {
+public class InputListner extends Thread {
     // ゲームパッド用パーツ用意
     ControlIO control;
     private ControlDevice device;
@@ -8,13 +8,6 @@ public class InputListner implements Runnable {
     private boolean[] onKey;
     private boolean[] press;
     private int scratch_status;
-    private ArrayList<Boolean> key_status;     //キーを覚える配列（同時押し用）
-    Thread init;
-
-    public InputListner() {
-        init = new Thread(this);
-        init.start();
-    }
 
     public void run() {
         key_status = new ArrayList<Boolean>();
@@ -39,94 +32,7 @@ public class InputListner implements Runnable {
         }
     }
 
-    public void keyPressed() {
-        if(init.isAlive()) {
-            return;
-        }
-        switch(keyCode) {
-        case ESC:
-            exit();
-        case SHIFT:
-            key_status.set(5, true);        //SCRATCH
-            break;
-        case ENTER:
-            case RETURN:
-            key_status.set(6, true);        //START
-            break;
-        case TAB:
-            key_status.set(7, true);       //SELECT
-            break;
-        }
-
-        switch(key) {
-        case 'c':
-        case 'C':
-            key_status.set(0, true);
-            break;
-        case 'v':
-        case 'V':
-            key_status.set(1, true);
-            break;
-        case 'b':
-        case 'B':
-            key_status.set(2, true);
-            break;
-        case 'n':
-        case 'N':
-            key_status.set(3, true);
-            break;
-        case 'm':
-        case 'M':
-            key_status.set(4, true);
-            break;
-        }
-    }
-
-    public void keyReleased() {
-        if(init.isAlive()) {
-            return;
-        }
-        switch(keyCode) {
-        case SHIFT:
-            key_status.set(5, false);
-            break;
-        case ENTER:
-        case RETURN:
-            key_status.set(6, false);          //START
-            break;
-        case TAB:
-            key_status.set(7, false);          //SELECT
-            break;
-        }
-
-        switch(key) {
-        case 'c':
-        case 'C':
-            key_status.set(0, false);
-            break;
-        case 'v':
-        case 'V':
-            key_status.set(1, false);
-            break;
-        case 'b':
-        case 'B':
-            key_status.set(2, false);
-            break;
-        case 'n':
-        case 'N':
-            key_status.set(3, false);
-            break;
-        case 'm':
-        case 'M':
-            key_status.set(4, false);
-            break;
-        }
-    }
-
     public void keyControll() {
-        if(init.isAlive()) {
-            return;
-        }
         //キーの処理
         press = new boolean[8];
 

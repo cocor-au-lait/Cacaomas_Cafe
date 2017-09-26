@@ -3,25 +3,37 @@ public abstract class Transition {
     protected int step_start_time;
     protected int elapsed_time;
     protected int step_elapsed_time;
+    private int overlay_time;
     protected int step;     //0:turn up, 1:keep, 2:turn down, -1:dead
 
     public Transition() {
         step_start_time = millis();
         start_time = millis();
     }
-
-    public void stepUp() {
-        if(step == 0) {
-            state = state.disposeState();
+    // 次のTransition描画に（overlay_time(ms)かけて）移行する
+    public void stepUp(int overlay_time) {
+        this.overlay_time = overlay_time;
+        // stateの初期化が終わっていなければ次のステップに移行しない
+        if(step == 1 && !state.finishInit()) {
+            return;
         }
-        else if(step == 1) {
-            if(!state.finishInit()) {
-                return;
-            }
+        // step++（3の場合は-1に）
+        step = step == 3 ? -1 : step + 1;
+        switch(step) {
+        case 1:
+            // 次のstateに以降
+            state = state.disposeState();
+            break;
+        case 3:
+            // drawStateを開始する直前動作を呼び出し
             state.beforeState();
         }
-        step = step == 2 ? -1 : step + 1;
+        // それぞれのdrawの開始時間を計測開始
         step_start_time = millis();
+    }
+
+    public void stepUp() {
+        stepUp(0);
     }
 
     // ###メソッド名をわかりやすく変更
@@ -30,7 +42,10 @@ public abstract class Transition {
     }
 
     public boolean isCovered() {
-        return step == 1 ? true : false;
+        if(step == 1 || step ==2) {
+            return true;
+        }
+        return false;
     }
 
     public void doTransition() {
@@ -44,17 +59,29 @@ public abstract class Transition {
         switch(step) {
         case 0:
             firstDraw();
-            return;
+            break;
         case 1:
+            if(step_elapsed_time < overlay_time) {
+                firstDraw();
+            }
             secondDraw();
-            return;
+            break;
         case 2:
+            if(step_elapsed_time < overlay_time) {
+                secondDraw();
+            }
             thirdDraw();
-            return;
+            break;
+        case 3:
+            if(step_elapsed_time < overlay_time) {
+                thirdDraw();
+            }
+            lastDraw();
         }
     }
 
     public abstract void firstDraw();
     public abstract void secondDraw();
     public abstract void thirdDraw();
+    public abstract void lastDraw();
 }

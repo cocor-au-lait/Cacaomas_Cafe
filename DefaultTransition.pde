@@ -28,6 +28,11 @@ public class DefaultTransition extends Transition {
     }
 
     public void thirdDraw() {
+        stepUp();
+        commonDraw();
+    }
+
+    public void lastDraw() {
         ratio = 1.0f - (step_elapsed_time / FADE_TIME);
         if(ratio < 0.0f) {
             stepUp();
