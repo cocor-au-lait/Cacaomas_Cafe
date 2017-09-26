@@ -14,6 +14,10 @@ public abstract class State implements Runnable {
         return !thread.isAlive();
     }
 
+    public boolean isControllable() {
+        return controllable;
+    }
+
     // ループ
     public void doState() {
         if(transition.isCovered()) {

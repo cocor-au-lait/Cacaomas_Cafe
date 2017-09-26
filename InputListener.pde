@@ -35,7 +35,6 @@ public class InputListner extends Thread {
     public void keyControll() {
         //キーの処理
         press = new boolean[8];
-
         // 白黒ボタン & その他キー
         for(int i = 0; i < 8; i++) {
             if(key_status.get(i) || (button[i] != null && button[i].pressed())) {

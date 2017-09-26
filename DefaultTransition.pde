@@ -1,3 +1,4 @@
+
 public class DefaultTransition extends Transition {
     private int deg;
     private float ratio;

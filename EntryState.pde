@@ -20,14 +20,6 @@ public class EntryState extends State {
         clear();
     }
 
-    public void openState() {
-        //stateMove.riseScene();
-    }
-
-    public void closeState() {
-        //stateMove.fallScene();
-    }
-
     public State disposeState() {
         return new SelectState();
     }
