@@ -1,5 +1,5 @@
 public class SetupState extends State {
-    private static final int MIN_TIME = 2000;
+    private static final int MIN_TIME = 1000;
 
     public SetupState() {
         textFont(createFont("PrestigeEliteStd-Bd",70,true));

@@ -12,6 +12,7 @@ public abstract class Transition {
         step_start_time = millis();
         start_time = millis();
     }
+
     // 次のTransition描画に（overlay_time(ms)かけて）移行する
     public void stepUp(int overlay_time) {
         this.overlay_time = overlay_time;
@@ -61,21 +62,12 @@ public abstract class Transition {
             firstDraw();
             break;
         case 1:
-            if(step_elapsed_time < overlay_time) {
-                firstDraw();
-            }
             secondDraw();
             break;
         case 2:
-            if(step_elapsed_time < overlay_time) {
-                secondDraw();
-            }
             thirdDraw();
             break;
         case 3:
-            if(step_elapsed_time < overlay_time) {
-                thirdDraw();
-            }
             lastDraw();
         }
     }

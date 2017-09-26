@@ -35,6 +35,7 @@ public void setup() {
     // !!!FX2Dレンダーはフォントが設定できなくなるので断念
     size(1280, 800, P2D);
     frameRate(60);
+    colorMode(HSV);
     //smooth(4);
     //fullScreen(P2D);
     pixelDensity(2);    //retinaに対応

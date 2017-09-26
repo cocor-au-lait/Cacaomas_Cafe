@@ -1,8 +1,7 @@
-
 public class DefaultTransition extends Transition {
     private int deg;
     private float ratio;
-    private static final int MIN_TIME = 1500; //3秒
+    private static final int MIN_TIME = 1000; //3秒
     private static final float FADE_TIME = 1000.0f;
 
     public DefaultTransition() {

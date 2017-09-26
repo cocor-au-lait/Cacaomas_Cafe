@@ -3,7 +3,6 @@ public class TitleState extends State {
     private AudioPlayer bgm;
     private SoundFile se;
     private PImage wallpaper, logo;
-    private PImage[] aaa;
 
     public void beforeState() {
         start_time = millis();
@@ -11,9 +10,7 @@ public class TitleState extends State {
     }
 
     public void drawState() {
-        // 背景
-        imageMode(CORNER);
-        image(wallpaper, 0 , 0, width, height);
+        background(color)
 
         // タイトルロゴ
         imageMode(CENTER);
@@ -27,7 +24,7 @@ public class TitleState extends State {
         if(listener.press[6] && !transition.isAlive()) {
             se.play();
             bgm.shiftGain(1, -80, 3000);
-            transition = new DefaultTransition();
+            transition = new GeneralTransition("Player Entry");
             controllable = false;
             println("se on!");
         }
@@ -35,8 +32,7 @@ public class TitleState extends State {
 
     public State disposeState() {
         bgm.close();
-        //se.close();
-        return new EntryState();
+        return new SelectState();
     }
 
     // バックグラウンド処理はこちら側に書く
