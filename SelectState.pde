@@ -7,14 +7,15 @@ public class SelectState extends State {
         bgm = minim.loadFile("sound/bgm/hanyo.mp3");
         bgm.loop();
     }
-    
+
     public void beforeState() {
     }
 
     public void drawState() {
         imageMode(CORNER);
         image(bg, 0 , 0, width, height);
-        setText(50, 0, CORNER);
+        //setText(50, 0, CORNER);
+        fill(0, 255);
         textAlign(CORNER, TOP);
         text("select music", 50, 50);
 
@@ -23,13 +24,17 @@ public class SelectState extends State {
             //phase = 2;
         }
     }
+    
+    public void popManage() {
+        
+    }
 
     public State disposeState() {
         bgm.close();
         minim.stop();
         return new DecideState();
     }
-    
+
     public void run() {
     }
 }

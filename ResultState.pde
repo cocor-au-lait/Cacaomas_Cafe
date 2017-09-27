@@ -36,6 +36,10 @@ public class ResultState extends State {
         text("fast:" + score_data.getfast(), 20, 420);
         text("slow:" + score_data.getSlow(), 20, 450);
     }
+    
+    public void popManage() {
+        
+    }
 
     public State disposeState() {
         return new SelectState();

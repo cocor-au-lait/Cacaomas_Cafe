@@ -488,6 +488,10 @@ public class PlayState extends State {
             }
         }
     }
+    
+    public void popManage() {
+        
+    }
 
     void openState() {
         //stateMove.fadeOut(1000);

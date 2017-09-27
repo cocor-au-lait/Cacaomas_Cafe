@@ -1,7 +1,7 @@
 public class DefaultTransition extends Transition {
     private int deg;
     private float ratio;
-    private static final int MIN_TIME = 1500; //3秒
+    private static final int MIN_TIME = 1000; //3秒
     private static final float FADE_TIME = 1000.0f;
 
     public DefaultTransition() {
@@ -28,6 +28,11 @@ public class DefaultTransition extends Transition {
     }
 
     public void thirdDraw() {
+        stepUp();
+        commonDraw();
+    }
+
+    public void lastDraw() {
         ratio = 1.0f - (step_elapsed_time / FADE_TIME);
         if(ratio < 0.0f) {
             stepUp();
