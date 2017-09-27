@@ -1,46 +1,83 @@
 public class TitleState extends State {
-    private String main_str;
     private AudioPlayer bgm;
     private SoundFile se;
-    private PImage wallpaper, logo;
+    private TitleBG titleBG;
 
-    public void beforeState() {
-        start_time = millis();
-        bgm.loop();
+    public TitleState() {
+        startTime = millis();
     }
+/*
+    public void beforeState() {
+        startTime = millis();
+        bgm.loop();
+    }*/
 
     public void drawState() {
-        background(color)
-
+        if(!thread.isAlive()) {
+            titleBG.drawObject();
+        }
         // タイトルロゴ
-        imageMode(CENTER);
-        image(logo, width / 2 , 180);
+        //imageMode(CORNER);
+        //image(logo, 246, 80, 789, 279);
 
         //各項目の描画
-        textSize(40);
-        fill(255);
-        text(main_str, width / 2, height * 0.8);
+        //textAlign(CENTER);
+        //textSize(40);
+        //fill(0);
+        //text("pless ENTER/START key to start", width / 2, height * 0.8);
 
-        if(listener.press[6] && !transition.isAlive()) {
+        /*if(listener.press[6] && !transition.isAlive()) {
             se.play();
             bgm.shiftGain(1, -80, 3000);
             transition = new GeneralTransition("Player Entry");
             controllable = false;
-            println("se on!");
-        }
+        }*/
     }
 
-    public State disposeState() {
+    /*public State disposeState() {
         bgm.close();
-        return new SelectState();
-    }
+        return new EntryState();
+    }*/
 
     // バックグラウンド処理はこちら側に書く
     public void run() {
-        main_str = new String("pless ENTER/START key to start");
         bgm = minim.loadFile("sound/bgm/title.wav");
         se = new SoundFile(applet, "sound/se/enter.wav");
-        wallpaper = loadImage("image/background/title.png");
-        logo = loadImage("image/parts/title_logo.png");
+        titleBG = new TitleBG("image/background/title.png");
+        //logo = loadImage("image/parts/title_logo.png");
+    }
+}
+
+public class TitleBG extends Object {
+    private PImage wallpaper;
+    private static final int FADE_IN_TIME = 1000;
+
+    public TitleBG(String filename) {
+        wallpaper = loadImage(filename);
+    }
+
+    public boolean drawIn() {
+        float ratio = (float)elapsedTime / (float)FADE_IN_TIME;
+        ratio = constrain(ratio, 0.0f, 1.0f);
+        float ratio2 = easeOutBack(ratio);
+        ratio = constrain(ratio, 0.0f, 10 .0f);
+        float alpha = 255.0f * ratio;
+        colorMode(ADD);
+        tint(255, alpha);
+        imageMode(CENTER);
+        image(wallpaper, width / 2, height / 2, width * ratio2, height * ratio2);
+        noTint();
+        colorMode(BLEND);
+        return ratio == 1.0 ? true : false;
+    }
+
+    public boolean drawing() {
+        imageMode(CORNER);
+        image(wallpaper, 0, 0, width, height);
+        return false;
+    }
+
+    public boolean drawOut() {
+        return false;
     }
 }

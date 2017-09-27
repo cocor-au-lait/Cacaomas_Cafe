@@ -15,5 +15,6 @@ Icon
 /doc/
 /item/
 /app/
+/readme/
 
 .gitignore

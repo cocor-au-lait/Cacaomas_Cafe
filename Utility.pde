@@ -22,3 +22,41 @@ public class FrameTimer {
         return 0;
     }
 }
+
+public abstract class Object {
+    int startTime;
+    int elapsedTime;
+    int step;
+    boolean startFlag;
+
+    public int drawObject() {
+        if(!startFlag) {
+            startTime = millis();
+            startFlag = true;
+        }
+        elapsedTime = millis() - startTime;
+        switch(step) {
+        case 0:
+            if(drawIn()) {
+                step++;
+                startTime = millis();
+            }
+            break;
+        case 1:
+            if(drawing()) {
+                step++;
+                startTime = millis();
+            }
+            break;
+        case 2:
+            if(drawOut()) {
+                step++;
+            }
+        }
+        return step;
+    }
+
+    abstract boolean drawIn();
+    abstract boolean drawing();
+    abstract boolean drawOut();
+}

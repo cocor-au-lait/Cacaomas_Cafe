@@ -10,9 +10,9 @@ public class InputListner extends Thread {
     private int scratch_status;
 
     public void run() {
-        key_status = new ArrayList<Boolean>();
+        keyStatus = new ArrayList<Boolean>();
         for(int i = 0; i < 8; i++) {
-            key_status.add(false);
+            keyStatus.add(false);
         }
         onKey = new boolean[8];
         press = new boolean[8];
@@ -37,7 +37,7 @@ public class InputListner extends Thread {
         press = new boolean[8];
         // 白黒ボタン & その他キー
         for(int i = 0; i < 8; i++) {
-            if(key_status.get(i) || (button[i] != null && button[i].pressed())) {
+            if(keyStatus.get(i) || (button[i] != null && button[i].pressed())) {
                 // キーボードかジョイスティックの入力があった場合
                 if(!onKey[i]) {
                     // まだ押されていなければ押された瞬間とする
@@ -51,7 +51,7 @@ public class InputListner extends Thread {
         }
 
         // スクラッチの処理
-        if(key_status.get(5) || (scratch != null && scratch.getValue() == 1.0)) {
+        if(keyStatus.get(5) || (scratch != null && scratch.getValue() == 1.0)) {
             // 右回転
             if(scratch_status != 1) {
                 // 以前が停止か左回りなら回した瞬間とする
@@ -59,7 +59,7 @@ public class InputListner extends Thread {
                 scratch_status = 1;
             }
         }
-        else if(key_status.get(5) || (scratch != null && scratch.getValue() == -1.0)) {
+        else if(keyStatus.get(5) || (scratch != null && scratch.getValue() == -1.0)) {
             // 左回転
             if(scratch_status != -1) {
                 // 以前が停止か右回りなら回した瞬間とする

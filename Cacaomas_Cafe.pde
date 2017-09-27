@@ -24,10 +24,9 @@ private State state;
 private Transition transition;
 // ボタン、キーボードの監視クラス
 private InputListner listener;
-// ###工夫をすればいらない関数かも
 private PApplet applet;
 // キーを覚える配列（同時押し用）
-private ArrayList<Boolean> key_status;
+private ArrayList<Boolean> keyStatus;
 
 public void setup() {
     // MacBook Pro 13インチのデフォルトより1段階低い解像度
@@ -35,10 +34,10 @@ public void setup() {
     // !!!FX2Dレンダーはフォントが設定できなくなるので断念
     size(1280, 800, P2D);
     frameRate(60);
-    colorMode(HSV);
+    colorMode(HSB);
     //smooth(4);
     //fullScreen(P2D);
-    pixelDensity(2);    //retinaに対応
+    pixelDensity(2);    //retina解像度に対応
     //noCursor();
     applet = this;
     state = new SetupState();
@@ -46,6 +45,7 @@ public void setup() {
 
 public void draw() {
     // 各ステートにおける動作、描画
+    listener.keyControll();
     state.doState();
     transition.doTransition();
 }
@@ -55,37 +55,37 @@ public void keyPressed() {
     case ESC:
         exit();
     case SHIFT:
-        key_status.set(5, true);        //SCRATCH
+        keyStatus.set(5, true);        //SCRATCH
         break;
     case ENTER:
     case RETURN:
-        key_status.set(6, true);        //START
+        keyStatus.set(6, true);        //START
         break;
     case TAB:
-        key_status.set(7, true);       //SELECT
+        keyStatus.set(7, true);       //SELECT
         break;
     }
 
     switch(key) {
     case 'c':
     case 'C':
-        key_status.set(0, true);
+        keyStatus.set(0, true);
         break;
     case 'v':
     case 'V':
-        key_status.set(1, true);
+        keyStatus.set(1, true);
         break;
     case 'b':
     case 'B':
-        key_status.set(2, true);
+        keyStatus.set(2, true);
         break;
     case 'n':
     case 'N':
-        key_status.set(3, true);
+        keyStatus.set(3, true);
         break;
     case 'm':
     case 'M':
-        key_status.set(4, true);
+        keyStatus.set(4, true);
         break;
     }
 }
@@ -93,37 +93,37 @@ public void keyPressed() {
 public void keyReleased() {
     switch(keyCode) {
     case SHIFT:
-        key_status.set(5, false);
+        keyStatus.set(5, false);
         break;
     case ENTER:
     case RETURN:
-        key_status.set(6, false);          //START
+        keyStatus.set(6, false);          //START
         break;
     case TAB:
-        key_status.set(7, false);          //SELECT
+        keyStatus.set(7, false);          //SELECT
         break;
     }
 
     switch(key) {
     case 'c':
     case 'C':
-        key_status.set(0, false);
+        keyStatus.set(0, false);
         break;
     case 'v':
     case 'V':
-        key_status.set(1, false);
+        keyStatus.set(1, false);
         break;
     case 'b':
     case 'B':
-        key_status.set(2, false);
+        keyStatus.set(2, false);
         break;
     case 'n':
     case 'N':
-        key_status.set(3, false);
+        keyStatus.set(3, false);
         break;
     case 'm':
     case 'M':
-        key_status.set(4, false);
+        keyStatus.set(4, false);
         break;
     }
 }

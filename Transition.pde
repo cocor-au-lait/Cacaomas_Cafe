@@ -3,9 +3,9 @@ public abstract class Transition {
     protected int step_start_time;
     protected int elapsed_time;
     protected int step_elapsed_time;
-    private int overlay_time;
     protected int step;     //0:turn up, 1:keep, 2:turn down, -1:dead
     protected int before_state_step_num;
+    protected int overlay_time;
 
     public Transition() {
         before_state_step_num = 3;
@@ -24,10 +24,10 @@ public abstract class Transition {
         step = step == 3 ? -1 : step + 1;
         if(step == 1) {
             // 次のstateに以降
-            state = state.disposeState();
+            //state = state.disposeState();
         } else if(step == before_state_step_num) {
             // drawStateを開始する直前動作を呼び出し
-            state.beforeState();
+            //state.beforeState();
         }
         // それぞれのdrawの開始時間を計測開始
         step_start_time = millis();
