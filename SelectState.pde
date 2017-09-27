@@ -24,6 +24,10 @@ public class SelectState extends State {
             //phase = 2;
         }
     }
+    
+    public void popManage() {
+        
+    }
 
     public State disposeState() {
         bgm.close();

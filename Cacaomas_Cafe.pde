@@ -40,6 +40,7 @@ public void setup() {
     pixelDensity(2);    //retina解像度に対応
     //noCursor();
     applet = this;
+    font = createFont("PrestigeEliteStd-Bd", 70, true);
     state = new SetupState();
 }
 

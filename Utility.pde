@@ -27,33 +27,40 @@ public abstract class Object {
     int startTime;
     int elapsedTime;
     int step;
-    boolean startFlag;
+    boolean canStart;
 
     public int drawObject() {
-        if(!startFlag) {
-            startTime = millis();
-            startFlag = true;
+        if(!canStart) {
+            return -1;
         }
         elapsedTime = millis() - startTime;
         switch(step) {
         case 0:
+            startTime = millis();
+            step++;
+            break;
+        case 1:
             if(drawIn()) {
                 step++;
                 startTime = millis();
             }
             break;
-        case 1:
+        case 2:
             if(drawing()) {
                 step++;
                 startTime = millis();
             }
             break;
-        case 2:
+        case 3:
             if(drawOut()) {
                 step++;
             }
         }
         return step;
+    }
+
+    public void start(boolean canStart) {
+        this.canStart = canStart;
     }
 
     abstract boolean drawIn();

@@ -33,6 +33,10 @@ public class DecideState extends State {
             flag = true;
         }
     }
+    
+    public void popManage() {
+        
+    }
 
     public void openState() {
         //phase = 1;

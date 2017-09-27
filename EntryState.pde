@@ -14,6 +14,10 @@ public class EntryState extends State {
         text("Point : " + player_data[0].getPoint(), 50, 150);
         text("Rank : " + player_data[0].getRank(), 50, 200);
     }
+    
+    public void popManage() {
+        
+    }
 
     public State disposeState() {
         return new SelectState();
