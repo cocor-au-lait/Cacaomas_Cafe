@@ -21,22 +21,24 @@ private Minim minim;
 // 各画面スーパークラス
 private State state;
 // 画面遷移描画スーパークラス
-private Transition transition;
+private State transition;
 // ボタン、キーボードの監視クラス
 private InputListner listener;
 private PApplet applet;
 // キーを覚える配列（同時押し用）
 private ArrayList<Boolean> keyStatus;
 
+private FrameRate debugFramerate = new FrameRate(60);
+
 public void setup() {
     // MacBook Pro 13インチのデフォルトより1段階低い解像度
     // GPUパワーを使うためP2Dレンダーを使用
     // !!!FX2Dレンダーはフォントが設定できなくなるので断念
     size(1280, 800, P2D);
+    //fullScreen(P2D);
     frameRate(60);
     colorMode(HSB);
     //smooth(4);
-    //fullScreen(P2D);
     pixelDensity(2);    //retina解像度に対応
     //noCursor();
     applet = this;
@@ -45,10 +47,12 @@ public void setup() {
 }
 
 public void draw() {
+    debugFramerate.Update();
+    surface.setTitle(debugFramerate.fps + "fps");
     // 各ステートにおける動作、描画
     listener.keyControll();
     state.doState();
-    transition.doTransition();
+    transition.doState();
 }
 // キーボードを押した時の処理（メインクラスでしか記述できないため）
 public void keyPressed() {

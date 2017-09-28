@@ -1,72 +1,136 @@
-public class DefaultTransition extends Transition {
-    private int deg;
-    private float ratio;
-    private static final int MIN_TIME = 1000; //3秒
-    private static final float FADE_TIME = 1000.0f;
+public class DefaultTransition extends State {
+    private static final int KEEP_TIME = 1000;
+    private DripBG dripBG;
+    private LogoFG logoFG;
 
     public DefaultTransition() {
+        dripBG = new DripBG(#553D2A);
     }
 
-    public DefaultTransition(int step) {
-        super.step = step;
+    public void run() {
+        logoFG = new LogoFG("image/parts/white_logo.png");
     }
 
-    public void firstDraw() {
-        ratio = step_elapsed_time / FADE_TIME;
-        if(ratio > 1.0f) {
-            stepUp();
-        }
-        commonDraw();
+    public void drawState() {
+        dripBG.drawObject();
+        logoFG.drawObject();
     }
 
-    public void secondDraw() {
-        ratio = 1.0f;
-        if(step_elapsed_time > MIN_TIME) {
-            stepUp();
-        }
-        commonDraw();
-    }
-
-    public void thirdDraw() {
-        stepUp();
-        commonDraw();
-    }
-
-    public void lastDraw() {
-        ratio = 1.0f - (step_elapsed_time / FADE_TIME);
-        if(ratio < 0.0f) {
-            stepUp();
-        }
-        commonDraw();
-    }
-
-    public void commonDraw() {
-        noStroke();
-        rectMode(CORNER);
-        int alpha = (int)map(ratio, 0.0f, 1.0f, 0.0f, 255.0f);
-        fill(255, alpha);
-        rect(0, 0, width, height);
-        pushMatrix();
-        translate(width / 2, height / 2);
-        rotate(radians(deg));
-        rectMode(CENTER);
-        fill(0, alpha);
-        rect(0, 0, 200, 200);
-        popMatrix();
-        deg = deg < 360 ? deg + 1 : 0;
-        String dot = new String();
-        switch((int)(elapsed_time / 500) % 3) {
-        case 0:
-            dot = new String(".");
+    public void popManage() {
+        switch(step) {
+        case 0:     // 幕が上がる
+            dripBG.start(1200);
+            stepUp(dripBG.isDrawing());
             break;
-        case 1:
-            dot = new String("..");
+        case 1:     // ロゴが現れる
+            //x_pos, y_pos, x_size, y_size
+            logoFG.start(880, 660, 362, 110);
+            stepUp(logoFG.isDrawing());
             break;
-        case 2:
-            dot = new String("...");
+        case 2:     // バックのStateを更新
+            state.goNextState();
+            stepUp();
             break;
+        case 3:     // ロード中
+            stepUp(stepElapsedTime > KEEP_TIME && state.isDeadThread());
+            break;
+        case 4:     // ロゴが消える
+            logoFG.forceDrawOut();
+            stepUp(logoFG.isDead());
+            break;
+        case 5:     // 幕が上がる
+            dripBG.forceDrawOut();
+            stepUp(dripBG.isDead());
+            break;
+        case 6:     // 解放
+            transition = new Empty();
         }
-        textSize(30);
-        text("now loading" + dot, width / 2, (height / 5 ) * 4);
+    }
+
+    public class DripBG extends Object {
+        private int fadeInTime;
+        private color bgColor;
+
+        public DripBG(color bgColor) {
+            this.bgColor = bgColor;
+        }
+
+        public boolean drawIn() {
+            float ratio;
+            ratio = (float)stepElapsedTime / (float)fadeInTime;
+            ratio = constrain(ratio, 0.0f, 1.0f);
+            ratio = easeInCubic(ratio);
+            commonDraw(ratio);
+            return ratio == 1.0f ? true : false;
+        }
+
+        public void start(int fadeInTime) {
+            this.fadeInTime = fadeInTime;
+            start();
+        }
+
+        public boolean drawing() {
+            commonDraw(1.0f);
+            return false;
+        }
+
+        public boolean drawOut() {
+            float ratio;
+            ratio = (float)stepElapsedTime / (float)fadeInTime;
+            ratio = constrain(ratio, 0.0f, 1.0f);
+            ratio = easeOutExpo(ratio);
+            commonDraw(1.0f - ratio);
+            return ratio == 1.0f ? true : false;
+        }
+
+        public void commonDraw(float ratio) {
+            fill(bgColor);
+            rectMode(CORNER);
+            rect(0, height - height * ratio, width, height);
+        }
+    }
+
+    public class LogoFG extends Object {
+        private static final int FADE_TIME = 500;
+        private PImage titleLogo;
+        private int x_pos, y_pos, x_size, y_size;
+
+        public LogoFG(String filename) {
+            titleLogo = loadImage(filename);
+        }
+
+        public void start(int x_pos, int y_pos, int x_size, int y_size) {
+            this.x_pos = x_pos;
+            this.y_pos = y_pos;
+            this.x_size = x_size;
+            this.y_size = y_size;
+            start();
+        }
+
+        public boolean drawIn() {
+            float ratio = (float)stepElapsedTime / (float)FADE_TIME;
+            ratio = constrain(ratio, 0.0f, 1.0f);
+            imageMode(CORNER);
+            tint(255, 255.0f * ratio);
+            image(titleLogo, x_pos, y_pos, x_size, y_size);
+            noTint();
+            return ratio == 1.0f ? true : false;
+        }
+
+        public boolean drawing() {
+            imageMode(CORNER);
+            image(titleLogo, x_pos, y_pos, x_size, y_size);
+            return false;
+        }
+
+        public boolean drawOut() {
+            float ratio = (float)stepElapsedTime / (float)FADE_TIME;
+            ratio = constrain(ratio, 0.0f, 1.0f);
+            imageMode(CORNER);
+            tint(255, 255.0f * (1.0f - ratio));
+            image(titleLogo, x_pos, y_pos, x_size, y_size);
+            noTint();
+            return ratio == 1.0f ? true : false;
+        }
     }
 }

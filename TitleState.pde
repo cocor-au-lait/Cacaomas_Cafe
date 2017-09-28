@@ -3,9 +3,9 @@ public class TitleState extends State {
     private SoundFile se;
     private TitleBG titleBG;
     private WhiteoutOG whiteoutOG;
-    private TextFG textFG;
     private PartsMG[] partsMG;
     private LogoFG logoFG;
+    private TextFG textFG;
 
     public void run() {
         bgm = minim.loadFile("sound/bgm/title.wav");
@@ -13,13 +13,14 @@ public class TitleState extends State {
         titleBG = new TitleBG("image/background/title.png");
         logoFG = new LogoFG("image/parts/black_logo.png");
         whiteoutOG = new WhiteoutOG();
-        textFG = new TextFG();
         partsMG = new PartsMG[5];
         partsMG[0] = new PartsMG(162, 96, 322, 0.22f, false);
         partsMG[1] = new PartsMG(52, 372, 256, 0.2f, true);
         partsMG[2] = new PartsMG(578, -87, 390, 0.15f, true);
         partsMG[3] = new PartsMG(934, 270, 183, 0.25f, true);
         partsMG[4] = new PartsMG(980, 490, 236, 0.19f, true);
+        textFG = new TextFG();
+        controllable = true;
     }
 
     public void drawState() {
@@ -34,29 +35,36 @@ public class TitleState extends State {
         textFG.drawObject();
         // OverGround
         whiteoutOG.drawObject();
-
-        //各項目の描画
-        //textAlign(CENTER);
-        //textSize(40);
-        //fill(0);
-        //text("pless ENTER/START key to start", width / 2, height * 0.8);
-
-        /*if(listener.press[6] && !transition.isAlive()) {
-            se.play();
-            bgm.shiftGain(1, -80, 3000);
-            transition = new GeneralTransition("Player Entry");
-            controllable = false;
-        }*/
     }
 
     public void popManage() {
-        titleBG.start(true);
-        whiteoutOG.start(titleBG.canNextPop());
-        for(int i = 0; i < partsMG.length; i++) {
-            partsMG[i].start(whiteoutOG.canNextPop());
+        switch(step) {
+        case 0:
+            titleBG.start();
+            stepUp(titleBG.canNextPop());
+            break;
+        case 1:
+            whiteoutOG.start();
+            stepUp(whiteoutOG.canNextPop());
+            break;
+        case 2:
+            for(int i = 0; i < partsMG.length; i++) {
+                partsMG[i].start();
+            }
+            textFG.start();
+            logoFG.start();
+            stepUp(partsMG[0].isDrawing() && listener.getPress(6));
+            break;
+        case 3:
+            controllable = false;
+            se.play();
+            bgm.shiftGain(1, -80, 3000);
+            transition = new DefaultTransition();
+            stepUp(true);
         }
-        textFG.start(whiteoutOG.canNextPop());
-        logoFG.start(whiteoutOG.canNextPop());
+        if(canNextState) {
+            state = new EntryState();
+        }
     }
 
     /*public State disposeState() {
@@ -74,7 +82,7 @@ public class TitleState extends State {
         }
 
         public boolean drawIn() {
-            float ratio = (float)elapsedTime / (float)FADE_IN_TIME;
+            float ratio = (float)stepElapsedTime / (float)FADE_IN_TIME;
             ratio = constrain(ratio, 0.0f, 1.0f);
             float easedRatio = easeOutBack(ratio);
             if(easedRatio > 1.0f) {
@@ -109,7 +117,7 @@ public class TitleState extends State {
         private static final int FADE_TIME = 500;
 
         public boolean drawIn() {
-            float ratio = (float)elapsedTime / (float)FADE_TIME;
+            float ratio = (float)stepElapsedTime / (float)FADE_TIME;
             ratio = constrain(ratio, 0.0f, 1.0f);
             float alpha = ratio * 255.0f;
             fill(255, alpha);
@@ -127,7 +135,7 @@ public class TitleState extends State {
         }
 
         public boolean drawOut() {
-            float ratio = (float)elapsedTime / (float)FADE_TIME;
+            float ratio = (float)stepElapsedTime / (float)FADE_TIME;
             ratio = constrain(ratio, 0.0f, 1.0f);
             float alpha = (1.0f - ratio) * 255.0f;
             fill(255, alpha);
@@ -138,43 +146,6 @@ public class TitleState extends State {
 
         public boolean canNextPop() {
             return step > 1 ? true : false;
-        }
-    }
-
-    public class TextFG extends Object {
-        private static final int TEXT_SIZE = 35;
-        private static final int INTERVAL_TIME = 1000;
-        private boolean flag;
-
-        public boolean drawIn() {
-            return true;
-        }
-
-        public boolean drawing() {
-            float ratio;
-            ratio = (float)elapsedTime / (float)INTERVAL_TIME;
-            ratio = constrain(ratio, 0.0f, 1.0f);
-            ratio = easeInOutCubic(ratio);
-            float alpha;
-            if(flag) {
-                alpha = ratio * 255.0f;
-            } else {
-                alpha = (1.0f - ratio) * 255.0f;
-            }
-            fill(0, alpha);
-            textFont(font);
-            textSize(TEXT_SIZE);
-            textMode(CENTER);
-            text("pless ENTER/START key to start", width / 2, height * 0.8);
-            if(ratio == 1.0f) {
-                flag = !flag;
-                startTime = millis();
-            }
-            return false;
-        }
-
-        public boolean drawOut() {
-            return false;
         }
     }
 
@@ -239,8 +210,45 @@ public class TitleState extends State {
         }
 
         public boolean drawing() {
-            imageMode(CORNER);
-            image(titleLogo, 246, 80, 789, 279);
+            imageMode(CENTER);
+            image(titleLogo, width / 2, 200);
+            return false;
+        }
+
+        public boolean drawOut() {
+            return false;
+        }
+    }
+
+    public class TextFG extends Object {
+        private static final int TEXT_SIZE = 35;
+        private static final int INTERVAL_TIME = 1000;
+        private boolean flag;
+
+        public boolean drawIn() {
+            return true;
+        }
+
+        public boolean drawing() {
+            float ratio;
+            ratio = (float)stepElapsedTime / (float)INTERVAL_TIME;
+            ratio = constrain(ratio, 0.0f, 1.0f);
+            ratio = easeInOutCubic(ratio);
+            float alpha;
+            if(flag) {
+                alpha = ratio * 255.0f;
+            } else {
+                alpha = (1.0f - ratio) * 255.0f;
+            }
+            fill(0, alpha);
+            textFont(font);
+            textSize(TEXT_SIZE);
+            textAlign(CENTER);
+            text("pless ENTER/START key to start", width / 2, height * 0.8);
+            if(ratio == 1.0f) {
+                flag = !flag;
+                stepStartTime = millis();
+            }
             return false;
         }
 
