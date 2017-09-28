@@ -1,20 +1,19 @@
 public class SetupState extends State {
     private static final int MIN_TIME = 1000;
-    public SetupFG setupFG;
+    public TextFG textFG;
 
     public SetupState() {
         textFont(font);
-        setupFG = new SetupFG();
-        setupFG.commonDraw(0.0f);    // キャッシュ
+        textFG = new TextFG();
         startTime = millis();
-        setupFG.start(true);
+        stepStartTime = millis();
     }
 
     // バックグラウンド処理はこちら側に書く
     public void run() {
+        transition = new Empty();
         listener = new InputListner();
         listener.start();
-        transition = new DefaultTransition(-1);
         bms = new BmsController();
         minim = new Minim(applet);
         ////////////////////////////////////////////////////////////////////////////////////
@@ -23,24 +22,33 @@ public class SetupState extends State {
     }
 
     public void drawState() {
-        if(elapsedTime < 1000) {
-            return;
-        }
-        if(setupFG.drawObject() == 4) {
+        textFG.drawObject();
+    }
+
+    public void popManage() {
+        switch(step) {
+        case 0:     //真っ暗
+            stepUp(elapsedTime > 500);
+            break;
+        case 1:
+            textFG.start();
+            stepUp(textFG.isDead() && isDeadThread());
+            break;
+        case 2:
             state =  new TitleState();
         }
     }
 
-    public void popManage() {
-
-    }
-
-    public class SetupFG extends Object{
+    public class TextFG extends Object{
         private static final int FADE_TIME = 600;
         private static final int KEEP_TIME = 600;
 
+        public TextFG() {
+            commonDraw(0.0f);   //キャッシュ
+        }
+
         public boolean drawIn() {
-            float ratio = (float)elapsedTime / (float)FADE_TIME;
+            float ratio = (float)stepElapsedTime / (float)FADE_TIME;
             ratio = constrain(ratio, 0.0f, 1.0f);
             commonDraw(ratio);
             return ratio == 1.0f ? true : false;
@@ -48,14 +56,14 @@ public class SetupState extends State {
 
         public boolean drawing() {
             commonDraw(1.0f);
-            if(state.finishInit() && elapsedTime > KEEP_TIME) {
+            if(state.finishInit() && stepElapsedTime > KEEP_TIME) {
                 return true;
             }
             return false;
         }
 
         public boolean drawOut() {
-            float ratio = (float)elapsedTime / (float)FADE_TIME;
+            float ratio = (float)stepElapsedTime / (float)FADE_TIME;
             ratio = constrain(ratio, 0.0f, 1.0f);
             commonDraw(1.0f - ratio);
             return ratio == 1.0f ? true : false;

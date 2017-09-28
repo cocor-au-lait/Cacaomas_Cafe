@@ -72,4 +72,8 @@ public class InputListner extends Thread {
             scratch_status = 0;
         }
     }
+
+    public boolean getPress(int num) {
+        return press[num];
+    }
 }

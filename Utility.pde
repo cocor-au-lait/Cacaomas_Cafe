@@ -23,44 +23,85 @@ public class FrameTimer {
     }
 }
 
+public class FrameRate{
+    int frameRate_;
+    float fps, sumFPS;
+    int cntFPS;
+    FrameRate(int frameRate_){
+        this.frameRate_ = frameRate_;
+        fps = frameRate_;
+    }
+    void Update(){
+        if(cntFPS < frameRate_){
+            sumFPS += frameRate;
+            cntFPS++;
+        }else{
+            fps = round(sumFPS / frameRate_ * 10) / 10.0;
+            sumFPS = cntFPS = 0;
+        }
+    }
+}
+
 public abstract class Object {
     int startTime;
     int elapsedTime;
+    int stepStartTime;
+    int stepElapsedTime;
     int step;
-    boolean canStart;
+    boolean ready;      // 描画を開始してもいいかどうかの判定
 
-    public int drawObject() {
-        if(!canStart) {
-            return -1;
+    public void drawObject() {
+        if(!ready) {
+            return;
         }
         elapsedTime = millis() - startTime;
+        stepElapsedTime = millis() - stepStartTime;
         switch(step) {
         case 0:
-            startTime = millis();
-            step++;
+            stepUp(true);
             break;
         case 1:
-            if(drawIn()) {
-                step++;
-                startTime = millis();
-            }
+            stepUp(drawIn());
             break;
         case 2:
-            if(drawing()) {
-                step++;
-                startTime = millis();
-            }
+            stepUp(drawing());
             break;
         case 3:
-            if(drawOut()) {
-                step++;
-            }
+            stepUp(drawOut());
         }
-        return step;
     }
 
-    public void start(boolean canStart) {
-        this.canStart = canStart;
+    public void stepUp(boolean flag) {
+        if(flag) {
+            stepStartTime = millis();
+            step++;
+        }
+    }
+
+    public boolean isDrawIn() {
+        return step == 1 ? true : false;
+    }
+
+    public boolean isDrawing() {
+        return step == 2 ? true : false;
+    }
+
+    public boolean isDrawOut() {
+        return step == 3 ? true : false;
+    }
+
+    public boolean isDead() {
+        return step == 4 ? true : false;
+    }
+
+    public void forceDrawOut() {
+        if(step == 2) {
+            stepUp(true);
+        }
+    }
+
+    public void start() {
+        ready = true;
     }
 
     abstract boolean drawIn();
