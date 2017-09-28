@@ -16,7 +16,7 @@ public class SetupState extends State {
         listener.start();
         bms = new BmsController();
         minim = new Minim(applet);
-        ////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////
         // データベースの設定
         db = new SQLite(applet, "database.db");
     }
