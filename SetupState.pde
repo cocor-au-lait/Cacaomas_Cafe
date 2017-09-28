@@ -19,6 +19,8 @@ public class SetupState extends State {
         //////////////////////////////////////////////////////
         // データベースの設定
         db = new SQLite(applet, "database.db");
+        font1 = createFont("Apple Chancery", 50, true);
+        font2 = createFont("Ayuthaya", 50, true);
     }
 
     public void drawState() {

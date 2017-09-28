@@ -57,7 +57,7 @@ public class TitleState extends State {
             break;
         case 3:
             controllable = false;
-            se.play();
+            //se.play();
             bgm.shiftGain(1, -80, 3000);
             transition = new DefaultTransition();
             stepUp(true);
@@ -66,11 +66,6 @@ public class TitleState extends State {
             state = new EntryState();
         }
     }
-
-    /*public State disposeState() {
-        bgm.close();
-        return new EntryState();
-    }*/
 
     public class TitleBG extends Object {
         private PImage wallpaper;

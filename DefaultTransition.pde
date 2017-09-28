@@ -3,8 +3,11 @@ public class DefaultTransition extends State {
     private DripBG dripBG;
     private LogoFG logoFG;
     private TipFG tipFG;
+    private SoundFile se;
 
     public DefaultTransition() {
+        se = new SoundFile(applet, "sound/se/select.wav");
+        se.play();
         dripBG = new DripBG(#553D2A);
     }
 
