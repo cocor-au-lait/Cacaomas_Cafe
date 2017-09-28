@@ -1,11 +1,14 @@
 public class EntryState extends State {
     private PlayerData[] player_data;
-
-    public void beforeState() {
-    }
+    private PImage card, icon;
 
     public void drawState() {
         background(#FDD491);
+
+        imageMode(CENTER);
+        image(card, width / 2, 415);
+        image(icon, 301, 445);
+        textMode(CORNER);
 
         textAlign(LEFT);
         textSize(30);
@@ -14,9 +17,9 @@ public class EntryState extends State {
         text("Point : " + player_data[0].getPoint(), 50, 150);
         text("Rank : " + player_data[0].getRank(), 50, 200);
     }
-    
+
     public void popManage() {
-        
+
     }
 
     public State disposeState() {
@@ -40,5 +43,8 @@ public class EntryState extends State {
         player_data[0].setPoint(db.getInt("point"));
         player_data[0].setRank(db.getInt("rank"));
         db.close();
+
+        card = loadImage("image/parts/card1.png");
+        icon = loadImage("image/parts/icon1.png");
     }
 }

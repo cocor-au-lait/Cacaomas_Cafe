@@ -15,7 +15,7 @@ private BmsController bms;
 private SQLite db;
 // データベースprivate SQLite db;
 // ###加えて各ステートで使うフォントを読み込ませる
-private PFont font;
+private PFont font, font1, font2, font3;
 // 音楽ファイルコア（画面遷移の際にも音が再生できるようにグローバル変数として設定）
 private Minim minim;
 // 各画面スーパークラス
