@@ -1,183 +1,188 @@
-public class DefaultTransition extends State {
-    private static final int KEEP_TIME = 1500;
-    private DripBG dripBG;
-    private LogoFG logoFG;
-    private TipFG tipFG;
+private class DefaultTransition extends Scene {
+    private int step, openStep, closeStep;
+    private RectObject background;
+    private ImageObject logo;
+    //rivate TipFG tipFG;
     private SoundFile se;
 
-    public DefaultTransition() {
+    private DefaultTransition() {
+        // 効果音はすぐに再生される必要があるためこちらに記述
         se = new SoundFile(applet, "sound/se/select.wav");
         se.play();
-        dripBG = new DripBG(#553D2A);
+        background = new RectObject();
+        background.setFillColor(color(#553D2A), 1.0f);
+        logo = new ImageObject("image/parts/white_logo.png");
+        logo.setPosition(880, 660, CORNER);
+        logo.setSize(362, 110);
+        sceneStartTime = millis();
+        startDrawing();
     }
 
     public void run() {
-        logoFG = new LogoFG("image/parts/white_logo.png");
-        tipFG = new TipFG("image/parts/tip_demo.png");
+        //logo.setFadeTime(600, 200);
+        //tipFG = new TipFG("image/parts/tip_demo.png");
     }
 
-    public void drawState() {
-        dripBG.drawObject();
-        logoFG.drawObject();
-        tipFG.drawObject();
-    }
+    @Override
+    protected void manageObjects() {
+        float ratio;
 
-    public void popManage() {
-        switch(step) {
-        case 0:     // 幕が上がる
-            dripBG.start();
-            stepUp(dripBG.isDrawing());
-            break;
-        case 1:     // ロゴが現れる
-            //x_pos, y_pos, x_size, y_size
-            logoFG.start(880, 660, 362, 110);
-            stepUp(logoFG.isDrawing());
-            break;
-        case 2:     // バックのStateを更新
-            state.goNextState();
-            stepUp();
-            break;
-        case 3:     // 表示インターバル
-            stepUp(stepElapsedTime > 400);
-            break;
-        case 4:     // チップが出現
-            tipFG.start();
-            stepUp(tipFG.isDrawing());
-            break;
-        case 5:     // ロード中
-            stepUp(stepElapsedTime > KEEP_TIME && state.isDeadThread());
-            break;
-        case 6:     // チップとロゴが消える
-            tipFG.forceDrawOut();
-            logoFG.forceDrawOut();
-            stepUp(logoFG.isDead() && tipFG.isDead());
-            break;
-        case 7:     // 幕が上がる
-            dripBG.forceDrawOut();
-            stepUp(dripBG.isDead());
-            break;
-        case 8:     // 解放
-            transition = new Empty();
+        switch(openStep) {
+        case 0:
+            /********************2.ACTION********************/
+            // 背景開始
+            background.start();
+            /********************3.STEPUP********************/
+            stepUp(0);
+        case 1:
+            /********************1.STANBY********************/
+            /*---------------------LOOP---------------------*/
+            // 背景が徐々に上昇して覆う
+            ratio = calcRatio(stepElapsedTime, 1300);
+            manageBackground(0, ratio);
+            /*-------------------TRIGGER--------------------*/
+            if(ratio < 1.0f) {
+                break;
+            }
+            /********************2.ACTION********************/
+            mainScene.nextScene();
+            /********************3.STEPUP********************/
+            stepUp(0);
+        case 2:
+            /********************1.STANBY********************/
+            /*-------------------TRIGGER--------------------*/
+            if(stepElapsedTime < 300) {
+                break;
+            }
+            /********************2.ACTION********************/
+            logo.start();
+            /********************3.STEPUP********************/
+            stepUp(0);
+        case 3:
+            /********************1.STANBY********************/
+            /*---------------------LOOP---------------------*/
+            // ロゴのフェードイン
+            ratio = calcRatio(stepElapsedTime, 600);
+            logo.setColor(color(255), ratio);
+            /*-------------------TRIGGER--------------------*/
+            if(ratio < 1.0f) {
+                break;
+            }
+            /********************2.ACTION********************/
+            /********************3.STEPUP********************/
+            stepUp(0);
+            /**********************END***********************/
+        case 4:
+            if(stepElapsedTime > 2000) {
+                openStep++;
+                stepUp(1);
+            }
+        }
+
+        switch(closeStep) {
+            case 0:
+                break;
+            case 1: {
+                /********************1.STANBY********************/
+                /*---------------------LOOP---------------------*/
+                // ロゴのフェードアウト
+                ratio = calcRatio(stepElapsedTime, 200);
+                logo.setColor(color(255), 1.0f - ratio);
+                /*-------------------TRIGGER--------------------*/
+                if(ratio < 1.0f) {
+                    break;
+                }
+                /********************2.ACTION********************/
+                /********************3.STEPUP********************/
+                stepUp(1);
+            }
+            case 2: {
+                /********************1.STANBY********************/
+                /*---------------------LOOP---------------------*/
+                // 背景が徐々に上昇して覆う
+                ratio = calcRatio(stepElapsedTime, 400);
+                manageBackground(1, ratio);
+                /*-------------------TRIGGER--------------------*/
+                if(ratio < 1.0f) {
+                    break;
+                }
+                /********************2.ACTION********************/
+                nextScene();
+                /********************3.STEPUP********************/
+                /**********************END***********************/
+            }
         }
     }
 
-    public class DripBG extends Object {
-        private static final int FADE_IN_TIME = 900;
-        private static final int FADE_OUT_TIME = 600;
-        private color bgColor;
-
-        public DripBG(color bgColor) {
-            this.bgColor = bgColor;
+    private void stepUp(int mode) {
+        stepStartTime = millis();
+        stepElapsedTime = 0;
+        if(mode == 0) {
+            openStep++;
+        } else {
+            closeStep++;
         }
+    }
 
-        public boolean drawIn() {
-            float ratio;
-            ratio = (float)stepElapsedTime / (float)FADE_IN_TIME;
-            ratio = constrain(ratio, 0.0f, 1.0f);
-            ratio = easeInCubic(ratio);
-            commonDraw(ratio);
-            return ratio == 1.0f ? true : false;
-        }
-
-        public boolean drawing() {
-            commonDraw(1.0f);
-            return false;
-        }
-
-        public boolean drawOut() {
-            float ratio;
-            ratio = (float)stepElapsedTime / (float)FADE_OUT_TIME;
-            ratio = constrain(ratio, 0.0f, 1.0f);
+    private void manageBackground(int mode, float ratio) {
+        if(mode == 0/*フェードイン*/) {
+            ratio = easeInCirc(ratio);
+        } else/*フェードアウト*/ {
             ratio = easeOutExpo(ratio);
-            commonDraw(1.0f - ratio);
-            return ratio == 1.0f ? true : false;
+            ratio = 1.0f - ratio;
         }
-
-        public void commonDraw(float ratio) {
-            fill(bgColor);
-            rectMode(CORNER);
-            rect(0, height - height * ratio, width, height);
-        }
+        background.setPosition(0, height * (1.0f - ratio), CORNER);
+        background.setSize(width, height * ratio);
     }
 
-    public class LogoFG extends Object {
-        private static final int FADE_IN_TIME = 600;
-        private static final int FADE_OUT_TIME = 200;
-        private PImage titleLogo;
-        private int x_pos, y_pos, x_size, y_size;
-
-        public LogoFG(String filename) {
-            titleLogo = loadImage(filename);
-        }
-
-        public void start(int x_pos, int y_pos, int x_size, int y_size) {
-            this.x_pos = x_pos;
-            this.y_pos = y_pos;
-            this.x_size = x_size;
-            this.y_size = y_size;
-            start();
-        }
-
-        public boolean drawIn() {
-            float ratio = (float)stepElapsedTime / (float)FADE_IN_TIME;
-            ratio = constrain(ratio, 0.0f, 1.0f);
-            imageMode(CORNER);
-            tint(255, 255.0f * ratio);
-            image(titleLogo, x_pos, y_pos, x_size, y_size);
-            noTint();
-            return ratio == 1.0f ? true : false;
-        }
-
-        public boolean drawing() {
-            imageMode(CORNER);
-            image(titleLogo, x_pos, y_pos, x_size, y_size);
-            return false;
-        }
-
-        public boolean drawOut() {
-            float ratio = (float)stepElapsedTime / (float)FADE_OUT_TIME;
-            ratio = constrain(ratio, 0.0f, 1.0f);
-            imageMode(CORNER);
-            tint(255, 255.0f * (1.0f - ratio));
-            image(titleLogo, x_pos, y_pos, x_size, y_size);
-            noTint();
-            return ratio == 1.0f ? true : false;
-        }
+    @Override
+    protected void drawObjects() {
+        background.draw();
+        logo.draw();
+        //tipFG.behavior();
     }
 
-    public class TipFG extends Object {
-        private PImage tipImage;
-        private static final int FADE_IN_TIME = 1000;
-        private static final int FADE_OUT_TIME = 300;
-
-        public TipFG(String filename) {
-            tipImage = loadImage(filename);
-        }
-
-        public boolean drawIn() {
-            float ratio = (float)stepElapsedTime / (float)FADE_IN_TIME;
-            ratio = constrain(ratio, 0.0f, 1.0f);
-            ratio = easeOutExpo(ratio);
-            float x_pos = -800 + (1054 * ratio);
-            imageMode(CORNER);
-            image(tipImage, x_pos, 80, 772, 568);
-            return ratio == 1.0f ? true : false;
-        }
-
-        public boolean drawing() {
-            imageMode(CORNER);
-            image(tipImage, 254, 80, 772, 568);
-            return false;
-        }
-
-        public boolean drawOut() {
-            float ratio = (float)stepElapsedTime / (float)FADE_OUT_TIME;
-            ratio = constrain(ratio, 0.0f, 1.0f);
-            ratio = easeOutCirc(ratio);
-            float x_pos = 254 + (1100 * ratio);
-            imageMode(CORNER);
-            image(tipImage, x_pos, 80, 772, 568);
-            return ratio == 1.0f ? true : false;
-        }
+    @Override
+    protected Scene nextScene() {
+        return new Empty();
     }
+
+
+
+    /*
+    public class TipFG extends LifeCycleObject {
+     private PImage tipImage;
+     private static final int FADE_IN_TIME = 1000;
+     private static final int FADE_OUT_TIME = 300;
+
+     public TipFG(String filename) {
+     tipImage = loadImage(filename);
+     }
+
+     public boolean drawIn() {
+     float ratio = (float)stepElapsedTime / (float)FADE_IN_TIME;
+     ratio = constrain(ratio, 0.0f, 1.0f);
+     ratio = easeOutExpo(ratio);
+     float x_pos = -800 + (1054 * ratio);
+     imageMode(CORNER);
+     image(tipImage, x_pos, 80, 772, 568);
+     return ratio == 1.0f ? true : false;
+     }
+
+     public boolean drawing() {
+     imageMode(CORNER);
+     image(tipImage, 254, 80, 772, 568);
+     return false;
+     }
+
+     public boolean drawOut() {
+     float ratio = (float)stepElapsedTime / (float)FADE_OUT_TIME;
+     ratio = constrain(ratio, 0.0f, 1.0f);
+     ratio = easeOutCirc(ratio);
+     float x_pos = 254 + (1100 * ratio);
+     imageMode(CORNER);
+     image(tipImage, x_pos, 80, 772, 568);
+     return ratio == 1.0f ? true : false;
+     }
+     }*/
 }

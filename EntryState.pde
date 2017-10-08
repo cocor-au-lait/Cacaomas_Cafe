@@ -1,4 +1,4 @@
-public class EntryState extends State {
+/*public class EntryState extends State {
     private PlayerData[] player_data;
     private PImage card, icon;
 
@@ -47,4 +47,4 @@ public class EntryState extends State {
         card = loadImage("image/parts/card1.png");
         icon = loadImage("image/parts/icon1.png");
     }
-}
+}*/

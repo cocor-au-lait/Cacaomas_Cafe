@@ -1,5 +1,7 @@
 import java.io.*;                   // ファイルの読み書き
 import java.math.BigDecimal;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 import ddf.minim.*;
 // ###将来的にサウンドファイルをMinimに統一する可能性
@@ -10,50 +12,79 @@ import de.bezier.data.sql.*;        // データベース用
 
 // 以下の変数は一度インスタンスするだけでいいためこちらに記述
 // 譜面ファイル制御クラス
-private BmsController bms;
+//private BmsController bms;
 // データベース管理
 private SQLite db;
 // データベースprivate SQLite db;
 // ###加えて各ステートで使うフォントを読み込ませる
-private PFont font, font1, font2, font3;
+private PFont font0, font1, font2, font3;
 // 音楽ファイルコア（画面遷移の際にも音が再生できるようにグローバル変数として設定）
 private Minim minim;
-// 各画面スーパークラス
-private State state;
-// 画面遷移描画スーパークラス
-private State transition;
+// ポリモーフィズムを利用して各画面を構成
+private Scene mainScene, nextScene, transitionScene;
 // ボタン、キーボードの監視クラス
-private InputListner listener;
-private PApplet applet;
+private InputListner inputListener;
+private PApplet applet = this;
 // キーを覚える配列（同時押し用）
 private ArrayList<Boolean> keyStatus;
-
-private FrameRate debugFramerate = new FrameRate(60);
+private float displayScale, marginScale, widthMargin, heightMargin;
+private static final int FRAME_RATE = 60;
+private static final int WIDTH = 1280;
+private static final int HEIGHT = 800;
+// フレーム単位の処理を補助するタイマー
+private FrameTimer frameTimer = new FrameTimer();
+// デバッグ用平均FPS表示関数
+private FrameRate debugFramerate = new FrameRate();
 
 public void setup() {
     // MacBook Pro 13インチのデフォルトより1段階低い解像度
     // GPUパワーを使うためP2Dレンダーを使用
     // !!!FX2Dレンダーはフォントが設定できなくなるので断念
     size(1280, 800, P2D);
+    frame.setResizable(true);
     //fullScreen(P2D);
-    frameRate(60);
-    colorMode(HSB);
-    //smooth(4);
-    pixelDensity(2);    //retina解像度に対応
+    pixelDensity(displayDensity());    //retina解像度に対応
+
     //noCursor();
-    applet = this;
-    font = createFont("PrestigeEliteStd-Bd", 70, true);
-    state = new SetupState();
+    frameRate(60);
+    //smooth(4);
+    colorMode(HSB, 255.0f, 255.0f, 255.0f, 1.0f);
+    font0 = createFont("PrestigeEliteStd-Bd", 70, true);
+    mainScene = new SetupScene();
+    transitionScene = new Empty();
 }
 
 public void draw() {
+    // 画面サイズの調節
+    float widthScale = (float)width / (float)WIDTH;
+    float heightScale = (float)height / (float)HEIGHT;
+    // 拡大倍率が低い方を全体スケーリングにすることで部品のはみ出しを防ぐ
+    if(widthScale < heightScale) {
+        displayScale = widthScale;
+        marginScale = heightScale;
+        widthMargin = 0.0f;
+        heightMargin = (height - HEIGHT * displayScale) / 2.0f;
+    } else {
+        displayScale = heightScale;
+        marginScale = widthScale;
+        widthMargin = (width - WIDTH * displayScale) / 2.0f;
+        heightMargin = 0.0f;
+    }
+    // デバッグ用FPS表示措置 ////////////////////////////////////////
     debugFramerate.Update();
     surface.setTitle(debugFramerate.fps + "fps");
-    // 各ステートにおける動作、描画
-    listener.keyControll();
-    state.doState();
-    transition.doState();
+    //////////////////////////////////////////////////////////////
+
+    // 入力されたキーの処理を行う
+    inputListener.manageInput();
+    // 各画面の管理、描画
+    mainScene.play();
+    // 画面切り替えの際にオーバーレイする画面の管理、描画
+    // メイン画面切り替えの際のつなぎ目として動作する
+    // 普段は描画を行わない
+    transitionScene.play();
 }
+
 // キーボードを押した時の処理（メインクラスでしか記述できないため）
 public void keyPressed() {
     switch(keyCode) {
