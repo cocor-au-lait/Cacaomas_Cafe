@@ -8,7 +8,7 @@ public class InputListner extends Thread {
     private boolean[] onKey;
     private boolean[] press;
     private int scratch_status;
-
+    // 初期化をThreadで行わせることで描画の開始を早くする
     public void run() {
         keyStatus = new ArrayList<Boolean>();
         for(int i = 0; i < 8; i++) {
@@ -32,7 +32,11 @@ public class InputListner extends Thread {
         }
     }
 
-    public void keyControll() {
+    public boolean onPressed(int num) {
+        return press[num];
+    }
+
+    public void manageInput() {
         //キーの処理
         press = new boolean[8];
         // 白黒ボタン & その他キー
@@ -71,9 +75,5 @@ public class InputListner extends Thread {
             // 回転停止
             scratch_status = 0;
         }
-    }
-
-    public boolean getPress(int num) {
-        return press[num];
     }
 }

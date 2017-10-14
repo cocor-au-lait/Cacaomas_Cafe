@@ -1,82 +1,171 @@
-public abstract class State implements Runnable {
-    protected int startTime;
-    protected int elapsedTime;
-    protected int stepStartTime;
-    protected int stepElapsedTime;
-    protected boolean controllable;
-    protected Thread thread;
-    protected int step;
-    protected boolean canNextState;
+// ほとんどの場合無名クラスとして実装するものの、ディープコピーを可能とするためにAbstractは外している
+private class State implements Cloneable {
+    protected int stateFrame;
+    protected int stateTime;
+    protected int loopCounter, loopNum;
+    protected LoopType loopType;
+    private boolean reverceFlag;
+    // Stateが起動しているかどうか
+    private boolean isActive;
 
-    protected State() {
-        thread = new Thread(this);
-        thread.start();
-        startTime = millis();
-        stepStartTime = millis();
-    }
-
-    public boolean isDeadThread() {
-        return !thread.isAlive();
-    }
-
-    public boolean finishInit() {
-        // スレッドが生きていればまだ初期化中ということ
-        return !thread.isAlive();
-    }
-
-    public void stepUp() {
-        stepStartTime = millis();
-        step++;
-    }
-
-    public void stepUp(boolean flag) {
-        if(flag) {
-            stepStartTime = millis();
-            step++;
+    // ディープコピーを可能とするためにオーバーライド
+    @Override
+    public State clone() {
+        State state = new State();
+        try {
+           state = (State)super.clone();
+        } catch (Exception e){
+            e.printStackTrace();
         }
+        return state;
     }
-
-    public void stepUp(boolean flag, int num) {
-        if(flag) {
-            stepStartTime = millis();
-            step++;
-        }
+    // Stateを開始するメソッド
+    protected final State enter() {
+        stateFrame = 0;
+        isActive = true;
+        onEnter();
+        return this;
     }
-
-    public void goNextState() {
-        canNextState = true;
+    protected final void exit() {
+        isActive = false;
+        onExit();
     }
-
-    public boolean isControllable() {
-        return controllable;
-    }
-    // ループ
-    public void doState() {
-        if(thread.isAlive()) {
+    // StateのメソッドをFrameごとに実行
+    protected final void update() {
+        if(!isActive) {
             return;
         }
-        // 各画面での経過時間の算出（ms）
-        elapsedTime = millis() - startTime;
-        stepElapsedTime = millis() - stepStartTime;
-        popManage();
-        // ステートの描画
-        drawState();
+        onUpdate();
+        if(!reverceFlag) {
+            stateTime = toTime(++stateFrame);
+        } else {
+            stateTime = toTime(--stateFrame);
+        }
     }
 
-    public abstract void drawState();
-    public abstract void popManage();
+    protected final void back() {
+        reverceFlag = true;
+    }
+
+    protected final void replay() {
+        reverceFlag = false;
+        stateFrame = 0;
+        loopCounter++;
+    }
+
+    protected final boolean isActive() {
+        return isActive;
+    }
+
+    /*protected final State setLoop(int loopNum, int loopType) {
+        this.loopNum = loopNum;
+        this.loopType = loopType;
+        return this;
+    }*/
+
+    protected void checkLoop() {
+        if(loopType == LoopType.YOYO && !reverceFlag) {
+            back();
+            return;
+        }
+        if(loopCounter == loopNum) {
+            this.exit();
+        }
+        if(loopType == LoopType.RESTART) {
+            replay();
+        }
+    }
+    /**
+     * サブクラスにて詳細を記述
+     */
+    // Stateに遷移した時に実行するメソッド
+    protected void onEnter() {}
+    // Stateに留まっている時に実行するメソッド
+    protected void onUpdate() {}
+    // Stateに遷移する時に実行するメソッド
+    protected void onExit() {}
 }
 
-public class Empty extends State {
-    public void run() {
+private class TweenState extends State {
+    private GameObject object;
+    private ParameterType type;
+    private float[] firstParam = new float[2];
+    private float[] paramRange = new float[2];
+    private int duration, loopInterval;
+    private Easing easing = new EasingLinear();
 
+    private TweenState (GameObject object, ParameterType type) {
+        this.object = object;
+        this.type = type;
     }
 
-    public void drawState() {
-
+    private TweenState setTween(float lastParam, int duration) {
+        getParameter();
+        this.paramRange[0]  = lastParam - firstParam[0];
+        this.duration = duration;
+        return this;
     }
 
-    public void popManage() {
+    private TweenState setTween(float lastParamX, float lastParamY, int duration) {
+        getParameter();
+        this.paramRange[0] = lastParamX;
+        this.paramRange[1] = lastParamY;
+        this.duration = duration;
+        return this;
+    }
 
+    private TweenState setEasing(Easing easing) {
+        this.easing = easing;
+        return this;
+    }
+
+    private TweenState setLoop(int loopNum, LoopType loopType, int loopInterval) {
+        this.loopNum = loopNum;
+        this.loopType = loopType;
+        this.loopInterval = loopInterval;
+        return this;
+    }
+
+    @Override
+    protected void onUpdate() {
+        float ratio = getRatio(stateTime, duration, easing);
+        setParameter(ratio);
+        if(stateTime > duration + loopInterval) {
+            stateFrame = toFrame(duration);
+            checkLoop();
+        } else if(stateTime < -loopInterval) {
+            replay();
+        }
+    }
+
+    private void getParameter() {
+        switch(type) {
+        case ALPHA:
+            firstParam[0] = object.getAlpha();
+            break;
+        case SCALE:
+            firstParam[0] = object.getScale();
+            break;
+        case POSITION:
+            float[] postition = object.getPosition();
+            firstParam[0] = postition[0];
+            firstParam[1] = postition[1];
+            break;
+        }
+    }
+
+    private void setParameter(float ratio) {
+        switch(type) {
+        case ALPHA:
+            object.setAlpha(firstParam[0] + paramRange[0] * ratio);
+            break;
+        case SCALE:
+            object.setScale(firstParam[0] + paramRange[0] * ratio);
+            break;
+        case POSITION:
+            object.setPosition(firstParam[0] + paramRange[0] * ratio,
+                firstParam[1] + paramRange[1] * ratio);
+            break;
+        }
     }
 }
