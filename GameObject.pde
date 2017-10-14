@@ -1,18 +1,13 @@
-private abstract class GameObject {
-    protected int objectStartTime;
-    protected int objectElapsedTime;
-    protected boolean isActive, isFreeRefMode;
+private abstract class GameObject implements Cloneable {
+    private boolean isActive, isFreeRef;
     protected float posX, posY, sizeX, sizeY, posRX, posRY, rotation;
+    protected float scale = 1.0f;
     protected float alpha = 1.0f;
-    protected int align = CORNER;;
-    protected int blend = BLEND;
+    private int blend = BLEND;
     protected color colors;
-    protected int groupId = -1;
-    protected String parent;
-
-    protected final void setActive(boolean isActive) {
-        this.isActive = isActive;
-    }
+    private String groupName;
+    protected HashMap<String, State> states = new HashMap<String, State>();
+    protected ArrayList<State> subStates = new ArrayList<State>();
 
     protected final boolean isActive() {
         return isActive;
@@ -25,7 +20,7 @@ private abstract class GameObject {
     protected final void setPosition(float posX, float posY) {
         this.posX = posX;
         this.posY = posY;
-        if(isFreeRef) {
+        if(!isFreeRef) {
             setRefPosition(posX + sizeX / 2, posY + sizeY / 2);
         }
     }
@@ -35,10 +30,10 @@ private abstract class GameObject {
         return position;
     }
 
-    protected void setSize(float sizeX, float sizeY) {
+    protected final void setSize(float sizeX, float sizeY) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
-        if(isFreeRef) {
+        if(!isFreeRef) {
             setRefPosition(posX + sizeX / 2, posY + sizeY / 2);
         }
     }
@@ -46,6 +41,14 @@ private abstract class GameObject {
     protected final float[] getSize() {
         float[] size = {sizeX, sizeY};
         return size;
+    }
+
+    protected final void setScale(float scale) {
+        this.scale = scale;
+    }
+
+    protected final float getScale() {
+        return scale;
     }
 
     protected final void setRefPosition(float posRX, float posRY) {
@@ -58,23 +61,11 @@ private abstract class GameObject {
         return refPosition;
     }
 
-    protected final void setAlign(int align) {
-        this.align = align;
-    }
-
-    protected final int getAlign() {
-        return align;
-    }
-
     protected final void setBlend(int blend) {
         this.blend = blend;
     }
 
-    protected final void getBlend() {
-        return blend;
-    }
-
-    protected void setColor(color colors) {
+    protected final void setColor(color colors) {
         this.colors = colors;
     }
 
@@ -98,30 +89,165 @@ private abstract class GameObject {
         return rotation;
     }
 
-    protected final int getElapsedTime() {
-        return objectElapsedTime;
+    protected final void setGroup(String groupName) {
+        this.groupName = groupName;
     }
 
-    protected final void setParent(String parent) {
-        this.parent = parent;
+    protected final String getGroup() {
+        return groupName;
     }
 
-    protected final String getParent() {
-        return parent;
+
+    protected final void addState(String name, State state) {
+        states.put(name, state);
     }
+
+    protected final void enable() {
+        isActive = true;
+    }
+
+    protected final void enable(String name) {
+        isActive = true;
+        if(states.get(name) == null) {
+            println("No such state");
+            return;
+        }
+        states.get(name).enter();
+    }
+
+    protected final void startState(String name) {
+        isActive = true;
+        if(states.get(name) == null) {
+            println("No such state");
+            return;
+        }
+        states.get(name).enter();
+    }
+
+    protected final void checkState() {
+        if(!isActive) {
+            return;
+        }
+        /*if(nowState != null) {
+            nowState.update();
+        }*/
+        for(Entry<String, State> entry : states.entrySet()) {
+            entry.getValue().update();
+        }
+        for(State subState : subStates) {
+            subState.update();
+        }
+    }
+/*
+    protected final void transitionState(String name) {
+        if(states.get(name) == null) {
+            println("No such state");
+            return;
+        }
+        nowState.dispose();
+        nowState = states.get(name);
+        nowState.start();
+    }*/
+
+    protected final void disable() {
+        isActive = false;
+    }
+
+/*
+    protected final void transPosition(final float lastPosX, final float lastPosY, final int duration, final Easing easing, final int loopNum, final LoopType loopType, final int loopInterval) {
+        final float firstPosX = posX;
+        final float firstPosY = posY;
+        final float rangeX = lastPosX - firstPosX;
+        final float rangeY = lastPosY - firstPosY;
+        subStates.add(new State() {
+            @Override
+            protected void onUpdate() {
+                float ratio = getRatio(stateTime, duration, easing);
+                setPosition(firstPosX + rangeX * ratio, firstPosY + rangeY * ratio);
+                if(stateTime == duration + loopInterval) {
+                    checkLoop();
+                }
+            }
+        }.setLoop(loopNum, loopType).enter());
+    }
+
+    protected final void transPosition(float lastPosX, float lastPosY, int duration) {
+        transPosition(lastPosX, lastPosY, duration, new EasingLinear(), 0, 0, 0);
+    }
+
+    protected final void transPosition(float lastPosX, float lastPosY, int duration, Easing easing) {
+        transPosition(lastPosX, lastPosY, duration, easing, 0, 0, 0);
+    }
+
+    protected final void transPosition(float lastPosX, float lastPosY, int duration, int loopNum, LoopType loopType, int loopInterval) {
+        transPosition(lastPosX, lastPosY, duration, new EasingLinear(), loopNum, loopType, loopInterval);
+    }
+
+    protected final void transAlpha(final float lastAlpha, final int duration, final Easing easing, final LoopType loopNum, final int loopType) {
+        final float firstAlpha = alpha;
+        final float range = lastAlpha - firstAlpha;
+        subStates.add(new State() {
+            @Override
+            protected void onUpdate() {
+                float ratio = getRatio(stateTime, duration, easing);
+                setAlpha(firstAlpha + range * ratio);
+                if(stateTime == duration + loopInterval) {
+                    checkLoop();
+                }
+            }
+        }.setLoop(loopNum, loopType).enter());
+    }
+
+    protected final void transAlpha(float lastAlpha, int duration) {
+        transAlpha(lastAlpha, duration, new EasingLinear(), 0, 0);
+    }
+
+    protected final void transAlpha(float lastAlpha, int duration, Easing easing) {
+        transAlpha(lastAlpha, duration, easing, 0, 0);
+    }
+
+    protected final void transAlpha(float lastAlpha, int duration, int loopNum, LoopType loopType) {
+        transAlpha(lastAlpha, duration, new EasingLinear(), loopNum, loopType);
+    }
+
+    protected final void transScale(final float lastScale, final int duration, final Easing easing, final int loopNum, final LoopType loopType) {
+        final float firstScale = scale;
+        final float range = lastScale - firstScale;
+        subStates.add("new State() {
+            @Override
+            protected void onUpdate() {
+                float ratio = getRatio(stateTime, duration, easing);
+                setScale(firstScale + range * ratio);
+                if(stateTime == duration + loopInterval) {
+                    checkLoop();
+                }
+            }
+        }.setLoop(loopNum, loopType).enter());
+    }
+
+    protected final void transScale(float lastAlpha, int duration) {
+        transScale(lastAlpha, duration, new EasingLinear(), 0, 0);
+    }
+
+    protected final void transScale(float lastAlpha, int duration, Easing easing) {
+        transScale(lastAlpha, duration, easing, 0, 0);
+    }
+
+    protected final void transScale(float lastAlpha, int duration, int loopNum, LoopType loopType) {
+        transScale(lastAlpha, duration, new EasingLinear(), loopNum, loopType);
+    }
+    */
 
     // 実装メソッド
     protected final void draw() {
         if(!isActive) {
             return;
         }
-        objectElapsedTime = millis() - objectStartTime;
-        //phaseElapsedTime = millis() - phaseStartTime;
         blendMode(blend);
         pushMatrix();
         // 回転軸座標を図形の中心に移動
-        translate(posRX, posRY);
-        rotate(rotation);
+        //translate(posRX, posRY);
+        //rotate(rotation);
         concreteDraw();
         // 座標軸とブレンドモードを戻す
         popMatrix();
@@ -131,7 +257,54 @@ private abstract class GameObject {
     protected abstract void concreteDraw();
 }
 
-private class RotateFigureObject extends LifeCycleObject {
+/*
+private class GroupObject {
+    GameObject[] objects;
+
+    private GroupObject(GameObject ... objects) {
+        this.objects = objects;
+    }
+
+    protected final void setActive(boolean isActive) {
+        for(GameObject object : objects) {
+            object.isActive = isActive;
+        }
+    }
+
+    protected final void setAlign(int align) {
+        for(GameObject object : objects) {
+            object.align = align;
+        }
+    }
+
+    protected final void setBlend(int blend) {
+        for(GameObject object : objects) {
+            object.blend = blend;
+        }
+    }
+
+    protected void setColor(color colors) {
+        for(GameObject object : objects) {
+            object.colors = colors;
+        }
+    }
+
+    protected final void setAlpha(float alpha) {
+        for(GameObject object : objects) {
+            object.alpha = alpha;
+            println(alpha);
+        }
+    }
+
+    protected final void setRotation(float rotation) {
+        for(GameObject object : objects) {
+            object.rotation = rotation;
+        }
+    }
+}
+*/
+
+/*private class RotateFigureObject extends LifeCycleObject {
     private float degAdd = 30.0f;           // 1フレーム毎に回転する角度の増加量
     private int vertexNum = 4;              // 頂点の数（何角形か）
     private float posX, posY, sizeX, sizeY, alpha;
@@ -186,6 +359,7 @@ private class RotateFigureObject extends LifeCycleObject {
             vertex(sizeX * cos(radians(360 * i / vertexNum)), sizeY * sin(radians(360 * i / vertexNum)));
         }
         endShape(CLOSE);*/
+        /*
         rectMode(CENTER);
         noStroke();
         blendMode(ADD);
@@ -194,9 +368,9 @@ private class RotateFigureObject extends LifeCycleObject {
         popMatrix();
         blendMode(BLEND);
     }
-}
+}*/
 
-private class OverlayObject extends LifeCycleObject {
+/*private class OverlayObject extends LifeCycleObject {
     private int fadeTime;
     private color colors;
     private float alpha;
@@ -231,4 +405,4 @@ private class OverlayObject extends LifeCycleObject {
         noStroke();
         rect(0, 0, width, height);
     }
-}
+}*/

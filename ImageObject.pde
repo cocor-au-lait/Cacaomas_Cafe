@@ -1,43 +1,33 @@
-private class ImageObject extends LifeCycleObject {
+private class ImageObject extends GameObject {
     private PImage file;
-    private float posX, posY, sizeX, sizeY;
-    protected float alpha;
-    private color colors;
     private int mode = CORNER;
 
-    private ImageObject() {
+    @Override
+    public ImageObject clone(){
+        ImageObject object = new ImageObject();
+        try {
+            object = (ImageObject)super.clone();
+            object.states = new HashMap<String, State>(this.states);
+            object.subStates = new ArrayList<State>(this.subStates);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return object;
     }
 
-    private ImageObject(String filename) {
-        file = loadImage(filename);
-        sizeX = file.width;
-        sizeY = file.height;
+    private void setMode(int mode) {
+        this.mode = mode;
     }
 
     protected final void setImage(String filename) {
         file = loadImage(filename);
         sizeX = file.width;
         sizeY = file.height;
-    }
-
-    protected final void setPosition(float posX, float posY, int mode) {
-        this.posX = posX;
-        this.posY = posY;
-        this.mode = mode;
-    }
-
-    protected final void setSize(float sizeX, float sizeY) {
-        this.sizeX = sizeX;
-        this.sizeY = sizeY;
-    }
-
-    protected final void setColor(color colors, float alpha) {
-        this.colors = colors;
-        this.alpha = alpha;
+        colors = color(255);
     }
 
     @Override
-    protected void run() {
+    protected void concreteDraw() {
         tint(colors, alpha);
         imageMode(mode);
         image(file, posX, posY, sizeX, sizeY);
@@ -45,7 +35,7 @@ private class ImageObject extends LifeCycleObject {
     }
 }
 
-private class FadeImageObject extends ImageObject {
+/*private class FadeImageObject extends ImageObject {
     private int fadeInTime, fadeOutTime;
 
     private FadeImageObject(String filename) {
@@ -87,4 +77,4 @@ private class FadeImageObject extends ImageObject {
         }
         super.run();
     }
-}
+}*/

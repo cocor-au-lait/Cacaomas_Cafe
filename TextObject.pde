@@ -1,62 +1,74 @@
 private class TextObject extends GameObject {
-    private PFont font;
-    private String string;
+    private PFont font = font0;
+    private int alignX = LEFT;
+    private int alignY = TOP;
+    private String string = "";
     private float textSize;
-    private color colors;
     private boolean hasSize;
 
-    private TextObject() {
-        align = LEFT;
-    }
-
     @Override
-    protected void setSize(float sizeX, float sizeY) {
-        super.setSize(sizeX, sizeY);
-        hasSetSize = true;
+    public TextObject clone(){
+        TextObject object = new TextObject();
+        try {
+            object = (TextObject)super.clone();
+            object.states = new HashMap<String, State>(this.states);
+            object.subStates = new ArrayList<State>(this.subStates);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return object;
     }
 
-    private void removeSize() {
+    private TextObject removeSize() {
         hasSize = false;
+        return this;
     }
 
     private boolean hasSize() {
         return hasSize;
     }
 
-    private void setString(String string) {
+    private TextObject setText(String string) {
         this.string = string;
+        fill(0, 0);
+        return this;
     }
 
-    private String getString() {
+    private String getText() {
         return string;
     }
 
-    private void setFont(PFont font) {
+
+    protected final void setAlign(int alignX, int alignY) {
+        this.alignX = alignX;
+        this.alignY = alignY;
+    }
+
+    private GameObject setFont(PFont font) {
         this.font = font;
+        return this;
     }
 
-    private PFont getFont() {
-        return font;
-    }
-
-    private void setTextSize(float textSize) {
+    private TextObject setTextSize(float textSize) {
         this.textSize = textSize;
+        return this;
     }
 
     @Override
     protected void concreteDraw() {
         fill(colors, alpha);
         textFont(font);
-        textSize(size);
-        textAlign(align);
-        if(hasSetSize) {
-            text(string, posX, posY, posRX, posRY);
+        textSize(textSize * scale);
+        textAlign(alignX, alignY);
+        if(hasSize) {
+            text(string, posX, posY, sizeX, sizeY);
         } else {
             text(string, posX, posY);
         }
     }
 }
 
+/*
 private class LoopFadeTextObject extends TextObject {
     private int fadeTime;
     private boolean fadeMode;
@@ -137,4 +149,4 @@ private class FadeTextObject extends TextObject {
         }
         super.run();
     }
-}
+}*/

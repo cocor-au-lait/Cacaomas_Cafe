@@ -1,14 +1,31 @@
 private class FigureObject extends GameObject {
-    private float strokeWeight, strokeColors, strokeAlpha;
+    private float strokeWeight, strokeAlpha;
+    private color strokeColors;
     private int strokeJoin, strokeCap;
     private boolean canFill, canStroke;
+    private int mode = CORNER;
 
-    private FigureObject() {
-        align = CORNER;
+    private  FigureObject() {
+        canFill = true;
+        canStroke = false;
     }
 
+    @Override
+    public FigureObject clone(){
+        FigureObject object = new FigureObject();
+        try {
+            object = (FigureObject)super.clone();
+            object.states = new HashMap<String, State>(this.states);
+            object.subStates = new ArrayList<State>(this.subStates);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return object;
+    }
+
+
     //セッター＆ゲッター
-    private void setStrokeWeight(float strokeWeight) {
+    /*private void setStrokeWeight(float strokeWeight) {
         this.strokeWeight = strokeWeight;
     }
 
@@ -34,7 +51,7 @@ private class FigureObject extends GameObject {
     }
 
     private void setStrokeJoin(int strokeJoin) {
-        this.setStrokeJoin = setStrokeJoin;
+        this.strokeJoin = strokeJoin;
     }
 
     private int getStrokeJoin() {
@@ -49,7 +66,7 @@ private class FigureObject extends GameObject {
         return strokeCap;
     }
 
-    private setStroke(boolean canStroke) {
+    private void setStroke(boolean canStroke) {
         this.canStroke = canStroke;
     }
 
@@ -57,12 +74,16 @@ private class FigureObject extends GameObject {
         return canStroke;
     }
 
-    private setFill(boolean canFill) {
+    private void setFill(boolean canFill) {
         this.canFill = canFill;
     }
 
     private boolean canFill() {
         return canFill;
+    }*/
+
+    private void setMode(int mode) {
+        this.mode = mode;
     }
 
     // 実装メソッド

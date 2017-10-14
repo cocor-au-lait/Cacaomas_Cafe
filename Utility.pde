@@ -1,21 +1,56 @@
 // 擬似的なユーティリティークラス、実際はProcessing特有の処理があるため、別クラスにはできない
 
-private void setTextSetting(int size, PFont font, color textColor, int align) {
-    textSize(size);
-    textFont(font);
-    fill(textColor);
-    textAlign(align);
-}
-
-private float calcRatio(int elapsedTime, int duration) {
-    float ratio = (float)elapsedTime / (float)duration;
+private float getRatio(float elapsion, int duration) {
+    float ratio = elapsion / (float)duration;
     ratio = constrain(ratio, 0.0f, 1.0f);
     return ratio;
 }
 
+private float getRatio(float elapsion, int duration, Easing easing) {
+    float ratio = getRatio(elapsion, duration);
+    ratio = easing.get(ratio);
+    return ratio;
+}
+
+private float getAntiRatio(float elapsion, int duration) {
+    float ratio = getRatio(elapsion, duration);
+    ratio = 1.0f - ratio;
+    return ratio;
+}
+
+private float getAntiRatio(float elapsion, int duration, Easing easing) {
+    float ratio = getAntiRatio(elapsion, duration);
+    ratio = easing.get(ratio);
+    return ratio;
+}
+
+/*
+private class FrameCounter {
+    private int elapsedFrame;
+
+    private float calcElapsedTime() {
+        elapsedFrame++;
+        // 注意！！！ 1sec = 1.0fのfloat値として算出している
+        float elapsedTime = (float)elapsedFrame * 1.0f / (float)BASE_FRAME_RATE;
+        return elapsedTime;
+    }
+}
+*/
+
+// 時間（1000ms = 1.0f）をフレーム数（60fps換算）に変換する
+private int toFrame(int time) {
+    int frame = (int)((float)time * (float)BASE_FRAME_RATE / 1000.0f);
+    return frame;
+}
+// フレーム（1frame = 1000/60ms）を時間（ms）に変換する
+// ！！！注意：3frame = 50ms以下の精度で綺麗な数字は出せない
+private int toTime(int frame) {
+    int time = (int)((float)frame / (float)BASE_FRAME_RATE * 1000.0f);
+    return time;
+}
+
 // フレーム単位でアニメーションをするプログラムで処理落ち対策用のタイマークラス
 private class FrameTimer {
-    private static final int BASE_FRAME_RATE = 60;
     private int lastElapsedFrame;                            // 割り込みカウント数
     private long timerStartTime = System.nanoTime();    // 開始時間
 

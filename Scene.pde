@@ -1,31 +1,22 @@
 private abstract class Scene implements Runnable {
-    //protected int sceneStartTime;           // インスタンス時の時間(ms)
-    //protected int sceneElapsedTime;         // インスタンスから経過した時間(ms)
-    //protected int stepStartTime;            // 任意のタイミングで取得する時間(ms)
-    //protected int stepElapsedTime;          // 任意のタイミングから経過した時間(ms)
-    private int sceneElapsedFrame;
-    protected int sceneElapsedTime;
     protected boolean controllable;         // 操作の受け付けの制御
     private Thread thread;                // リソースの初期化を裏で行うスレッド
-    private boolean canDraw;
-    protected Map<String, GameObject> objects;
+    private boolean isActive;
+    private int sceneFrame;
+    private int sceneTime;
+    protected ArrayList<GameObject> objects = new ArrayList<GameObject>();
+    protected ArrayList<Sequence> sequences = new ArrayList<Sequence>();
 
     private Scene() {
-        objects = new LinkedHashMap<String, GameObject>();
         // リソースの初期化を裏で開始する
         thread = new Thread(this);
         thread.start();
     }
 
-    /*
-    protected void run() {
+    // Entryと同じ
+    public void run() {
         // 画像などのリソースをこちらで読み込むことで
         // バックでロード中のアニメーションを描画可能
-    }
-    */
-
-    protected final void startScene() {
-        canDraw = true;
     }
 
     // リソースの読み込みが終わっているか
@@ -33,34 +24,32 @@ private abstract class Scene implements Runnable {
         return !thread.isAlive();
     }
 
-    private final void play() {
-        if(!canDraw) {
-            return;
-        }
-        // 経過時間の算出
-        //sceneElapsedTime = millis() - sceneStartTime;
-        //stepElapsedTime = millis() - stepStartTime;
-        for(i = 0; i < frameTimer.getDiffFrame(); i++) {
-            sceneElapsedFrame++;
-            sceneElapsedTime = (int)((float)sceneElapsedFrame * 60.0f / 1000.0f);
-            manageObjects();
-        }
-        // オブジェクトを宣言した順に描画を行う
-        for(Map.Entry<String, GameObject> entry : objects.entrySet()) {
-            entry.getValue().draw();
-        }
+    protected final boolean isActive() {
+        return isActive;
     }
 
-    protected abstract void manageObjects();
-    /********************1.STANBY********************/
-    /*---------------------LOOP---------------------*/
-    /*-------------------TRIGGER--------------------*/
-    /********************2.ACTION********************/
-    /********************3.STEPUP********************/
-    /**********************END***********************/
-}
+    protected final void startScene() {
+        isActive = true;
+    }
 
-private class EmptyScene extends Scene {
-    public void run() {}
-    protected void manageObjects() {}
+    private final void process() {
+        if(!isActive) {
+            return;
+        }
+        for(int i = 0; i < frameTimer.getDiffFrame(); i++) {
+            for(GameObject object : objects) {
+                object.checkState();
+            }
+            for(Sequence sequence : sequences) {
+                sequence.process();
+            }
+        }
+        // オブジェクトを宣言した順に描画を行う
+        for(GameObject object : objects) {
+            object.draw();
+        }
+        sceneTime = toTime(++sceneFrame);
+    }
+
+    protected abstract Scene dispose();
 }

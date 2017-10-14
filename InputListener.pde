@@ -32,7 +32,7 @@ public class InputListner extends Thread {
         }
     }
 
-    public boolean getPress(int num) {
+    public boolean onPressed(int num) {
         return press[num];
     }
 

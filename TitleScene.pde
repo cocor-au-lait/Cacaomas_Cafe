@@ -1,16 +1,26 @@
 private class TitleScene extends Scene {
-    private int openStep;
-    private AudioPlayer bgm;
-    private SoundFile se;
-    private RotateFigureObject[] rotater;
-    private ImageObject logo, wallpaper;
-    private LoopFadeTextObject mainText;
-
     public void run() {
-        bgm = minim.loadFile("sound/bgm/title.wav");
-        se = new SoundFile(applet, "sound/se/enter.wav");
-        logo = new ImageObject("image/parts/black_logo.png");
-        logo.setPosition(width / 2, 200, CENTER);
+        final AudioPlayer bgm = minim.loadFile("sound/bgm/title.wav");
+        final SoundFile se = new SoundFile(applet, "sound/se/enter.wav");
+        // オブジェクト
+        final ImageObject logo = new ImageObject();
+        logo.setImage("image/parts/black_logo.png");
+        logo.setMode(CENTER);
+        logo.setPosition(BASE_WIDTH / 2, 200);
+        logo.setAlpha(0.0f);
+        logo.addState("fade", new TweenState(logo, ParameterType.ALPHA)
+            .setTween(1.0f, 500));
+
+        final ImageObject wallpaper = new ImageObject();
+        wallpaper.setImage("image/background/title.png");
+        wallpaper.setMode(CENTER);
+        wallpaper.setPosition(BASE_WIDTH / 2, BASE_HEIGHT / 2);
+        wallpaper.setSize(BASE_WIDTH, BASE_HEIGHT);
+        //wallpaper.setScale(0.5f);
+        wallpaper.setAlpha(0.0f);
+        wallpaper.addState("fade", new TweenState(wallpaper, ParameterType.ALPHA)
+            .setTween(1.0f, 500));
+        /*
         rotater = new RotateFigureObject[5];
         rotater[0] = new RotateFigureObject(0.22f, LEFT);
         rotater[0].setPosition(162, 96);
@@ -27,134 +37,60 @@ private class TitleScene extends Scene {
         rotater[4] = new RotateFigureObject(0.19f, RIGHT);
         rotater[4].setPosition(980, 490);
         rotater[4].setSize(236, 236);
-        mainText = new LoopFadeTextObject("pless ENTER/START key to start");
-        mainText.setFadeTime(1000);
-        mainText.setColor(color(0), 0);
+        */
+        final TextObject mainText = new TextObject();
         mainText.setFont(font0);
-        mainText.setPosition(width / 2, 670, CENTER);
-        mainText.setSize(35);
-        wallpaper = new ImageObject("image/background/title.png");
-        startDrawing();
+        mainText.setColor(color(0));
+        mainText.setAlpha(0.0f);
+        mainText.setAlign(CENTER, TOP);
+        mainText.setText("Pless START key to start");
+        mainText.setPosition(width / 2, 670);
+        mainText.setTextSize(35);
+        mainText.addState("flashLoop", new TweenState(mainText, ParameterType.ALPHA)
+            .setTween(1.0f, 500)
+            .setLoop(-1, LoopType.YOYO, 200));
+
+        // レイヤー
+        objects.add(wallpaper);
+        objects.add(logo);
+        objects.add(mainText);
+
+        // シーケンス（再生順が遅い順）
+        final Sequence idleSequence = new Sequence() {
+            @Override
+            protected void executeSchedule() {
+                if(inputListener.onPressed(6)) {
+                    se.play();
+                    bgm.shiftGain(1, -80, 3000);
+                    //subScene = this;
+                    exitSequence();
+                }
+            }
+        };
+        sequences.add(idleSequence);
+
+        final Sequence openingSequence = new Sequence() {
+            @Override
+            protected void executeSchedule() {
+                switch(keyTime) {
+                case 0:
+                    wallpaper.startState("fade");
+                    break;
+                case 1000:
+                    logo.startState("fade");
+                    mainText.startState("flashLoop");
+                    controllable = true;
+                    bgm.loop();
+                    exitSequence(idleSequence);
+                }
+            }
+        };
+        sequences.add(openingSequence);
+        openingSequence.startSequence();
     }
 
     @Override
-    protected void manageObjects() {
-        float ratio;
-
-        switch(openStep) {
-        case A:
-            /********************2.ACTION********************/
-            // 読み込みが終わったら起動する
-            wallpaper.start();
-            /********************3.STEPUP********************/
-            stepUp();
-        case 1:
-            /********************1.STANBY********************/
-            /*---------------------LOOP---------------------*/
-            // 背景がフェードイン
-            ratio = calcRatio(stepElapsedTime, 700);
-            wallpaper.setColor(color(255), ratio);
-
-            /*-------------------TRIGGER--------------------*/
-            if(ratio < 1.0f) {
-                break;
-            }
-            /********************2.ACTION********************/
-            /********************3.STEPUP********************/
-            stepUp();
-        case 2:
-            /********************1.STANBY********************/
-            /*-------------------TRIGGER--------------------*/
-            if(stepElapsedTime < 300) {
-                break;
-            }
-            /********************2.ACTION********************/
-            // ロゴと回る図形の描画開始
-            logo.start();
-            for(int i = 0; i < rotater.length; i++) {
-                rotater[i].start();
-            }
-            bgm.loop();
-            /********************3.STEPUP********************/
-            stepUp();
-        case 3:
-            /********************1.STANBY********************/
-            /*---------------------LOOP---------------------*/
-            // ロゴと図形がフェードイン
-            ratio = calcRatio(stepElapsedTime, 300);
-            logo.setColor(color(255), ratio);
-            for(int i = 0; i < rotater.length; i++) {
-                rotater[i].setColor(color(20), ratio);
-            }
-            /*-------------------TRIGGER--------------------*/
-            if(ratio < 1.0f) {
-                break;
-            }
-            /********************2.ACTION********************/
-            // テキスト描画開始 & 操作受け付け開始
-            controllable = true;
-            mainText.start();
-            /********************3.STEPUP********************/
-            stepUp();
-            /**********************END***********************/
-        }
-
-        if(controllable && inputListener.getPress(6)) {
-            controllable = false;
-            // 画面遷移を起動して後処理をする
-            bgm.shiftGain(1, -80, 3000);
-            transitionScene = new DefaultTransition();
-        }
-    }
-
-    private void stepUp() {
-        stepStartTime = millis();
-        stepElapsedTime = 0;
-        openStep++;
-    }
-
-    @Override
-    protected void drawObjects() {
-        // 下の層から順番に描画（オブジェクトが起動していない場合は何も起こらない）
-        wallpaper.draw();
-        for(int i = 0; i < rotater.length; i++) {
-            rotater[i].draw();
-        }
-        // テキストの座標を変えるコード
-
-        logo.draw();
-        mainText.draw();
-
-    }
-
-    @Override
-    protected Scene nextScene() {
-        //return new EnrtyScene();
+    protected Scene dispose() {
         return this;
     }
-
-    /*private class Wallpaper extends LifeCycleObject {
-        private PImage wallpaper = loadImage("image/background/title.png");
-        private int fadeTime = 1000;
-        private boolean canDrawNextObject;
-
-        protected void drawObject() {
-            float ratio = calcRatio(phaseElapsedTime, fadeTime);
-            if(ratio > 1.0f) {
-                canDrawNextObject = true;
-            }
-            ratio = easeOutBack(ratio);
-            float alpha = ratio * 255;
-            colorMode(ADD);
-            tint(255, alpha);
-            imageMode(CENTER);
-            image(wallpaper, width / 2, height / 2, width * ratio, height * ratio);
-            noTint();
-            colorMode(BLEND);
-        }
-
-        private boolean canDrawNextObject() {
-            return canDrawNextObject;
-        }
-    }*/
 }
