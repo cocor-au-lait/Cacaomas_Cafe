@@ -90,6 +90,7 @@ private class TweenState extends State {
     private GameObject object;
     private ParameterType type;
     private float[] firstParam = new float[2];
+    private float[] lastParam = new float[2];
     private float[] paramRange = new float[2];
     private int duration, loopInterval;
     private Easing easing = new EasingLinear();
@@ -100,16 +101,14 @@ private class TweenState extends State {
     }
 
     private TweenState setTween(float lastParam, int duration) {
-        getParameter();
-        this.paramRange[0]  = lastParam - firstParam[0];
+        this.lastParam[0] = lastParam;
         this.duration = duration;
         return this;
     }
 
     private TweenState setTween(float lastParamX, float lastParamY, int duration) {
-        getParameter();
-        this.paramRange[0] = lastParamX;
-        this.paramRange[1] = lastParamY;
+        this.lastParam[0] = lastParamX;
+        this.lastParam[1] = lastParamY;
         this.duration = duration;
         return this;
     }
@@ -124,6 +123,13 @@ private class TweenState extends State {
         this.loopType = loopType;
         this.loopInterval = loopInterval;
         return this;
+    }
+
+    @Override
+    protected void onEnter() {
+        getParameter();
+        paramRange[0] = lastParam[0] - firstParam[0];
+        paramRange[1] = lastParam[1] - firstParam[1];
     }
 
     @Override
@@ -151,6 +157,11 @@ private class TweenState extends State {
             firstParam[0] = postition[0];
             firstParam[1] = postition[1];
             break;
+        case SIZE:
+            float[] size = object.getSize();
+            firstParam[0] = size[0];
+            firstParam[1] = size[1];
+            break;
         }
     }
 
@@ -164,6 +175,10 @@ private class TweenState extends State {
             break;
         case POSITION:
             object.setPosition(firstParam[0] + paramRange[0] * ratio,
+                firstParam[1] + paramRange[1] * ratio);
+            break;
+        case SIZE:
+            object.setSize(firstParam[0] + paramRange[0] * ratio,
                 firstParam[1] + paramRange[1] * ratio);
             break;
         }

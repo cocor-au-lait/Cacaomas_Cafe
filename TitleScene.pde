@@ -1,7 +1,8 @@
 private class TitleScene extends Scene {
     public void run() {
         final AudioPlayer bgm = minim.loadFile("sound/bgm/title.wav");
-        final SoundFile se = new SoundFile(applet, "sound/se/enter.wav");
+        final SoundFile se = new SoundFile(applet, "sound/se/enter.mp3");
+        se.amp(0.5f);
         // オブジェクト
         final ImageObject logo = new ImageObject();
         logo.setImage("image/parts/black_logo.png");
@@ -15,7 +16,6 @@ private class TitleScene extends Scene {
         wallpaper.setImage("image/background/title.png");
         wallpaper.setMode(CENTER);
         wallpaper.setPosition(BASE_WIDTH / 2, BASE_HEIGHT / 2);
-        wallpaper.setSize(BASE_WIDTH, BASE_HEIGHT);
         //wallpaper.setScale(0.5f);
         wallpaper.setAlpha(0.0f);
         wallpaper.addState("fade", new TweenState(wallpaper, ParameterType.ALPHA)
@@ -50,26 +50,26 @@ private class TitleScene extends Scene {
             .setTween(1.0f, 500)
             .setLoop(-1, LoopType.YOYO, 200));
 
+        final FigureObject circle = new FigureObject();
+        circle.setCornerNum(0);
+        circle.setBlend(ADD);
+        circle.setColor(color(40));
+        circle.setSize(100, 100);
+        circle.setPosition(100, 100);
+        circle.setMode(CENTER);
+        circle.addState("loop", new TweenState(circle, ParameterType.POSITION)
+            .setTween(1000, 500, 3000)
+            .setLoop(-1, LoopType.YOYO, 0)
+            .setEasing(new EasingInOutCirc()));
+
         // レイヤー
         objects.add(wallpaper);
+        objects.add(circle);
         objects.add(logo);
         objects.add(mainText);
 
-        // シーケンス（再生順が遅い順）
-        final Sequence idleSequence = new Sequence() {
-            @Override
-            protected void executeSchedule() {
-                if(inputListener.onPressed(6)) {
-                    se.play();
-                    bgm.shiftGain(1, -80, 3000);
-                    //subScene = this;
-                    exitSequence();
-                }
-            }
-        };
-        sequences.add(idleSequence);
-
-        final Sequence openingSequence = new Sequence() {
+        // シーケンス
+        final Sequence enterSequence = new Sequence() {
             @Override
             protected void executeSchedule() {
                 switch(keyTime) {
@@ -77,16 +77,35 @@ private class TitleScene extends Scene {
                     wallpaper.startState("fade");
                     break;
                 case 1000:
+                    circle.startState("loop");
                     logo.startState("fade");
                     mainText.startState("flashLoop");
-                    controllable = true;
+                    //controllable = true;
                     bgm.loop();
-                    exitSequence(idleSequence);
+                    exitSequence(sequences.get("idleSQ"));
                 }
             }
         };
-        sequences.add(openingSequence);
-        openingSequence.startSequence();
+        sequences.put("enterSQ", enterSequence);
+
+        final Sequence idleSequence = new Sequence() {
+            @Override
+            protected void onStart() {
+                subScene = new DefaultTransition();
+            }
+            @Override
+            protected void executeSchedule() {
+                if(inputListener.onPressed(6)) {
+                    se.play();
+                    bgm.shiftGain(1, -80, 3000);
+                    subScene.startScene();
+                    exitSequence();
+                }
+            }
+        };
+        sequences.put("idleSQ", idleSequence);
+
+        enterSequence.startSequence();
     }
 
     @Override
