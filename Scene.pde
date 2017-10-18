@@ -3,9 +3,9 @@ private abstract class Scene implements Runnable {
     private Thread thread;                // リソースの初期化を裏で行うスレッド
     private boolean isActive;
     private int sceneFrame;
-    private int sceneTime;
+    protected int sceneTime;
     protected ArrayList<GameObject> objects = new ArrayList<GameObject>();
-    protected ArrayList<Sequence> sequences = new ArrayList<Sequence>();
+    protected HashMap<String, Sequence> sequences = new HashMap<String, Sequence>();
 
     private Scene() {
         // リソースの初期化を裏で開始する
@@ -28,6 +28,10 @@ private abstract class Scene implements Runnable {
         return isActive;
     }
 
+    protected final void stopScene() {
+        isActive = false;
+    }
+
     protected final void startScene() {
         isActive = true;
     }
@@ -36,19 +40,24 @@ private abstract class Scene implements Runnable {
         if(!isActive) {
             return;
         }
-        for(int i = 0; i < frameTimer.getDiffFrame(); i++) {
-            for(GameObject object : objects) {
-                object.checkState();
-            }
-            for(Sequence sequence : sequences) {
-                sequence.process();
-            }
+        // 各シーンの全オブジェクトに付与されているステートの更新を行う
+        for(GameObject object : objects) {
+            object.updateState();
+        }
+        for(Entry<String, Sequence> entry : sequences.entrySet()) {
+            entry.getValue().process();
+        }
+        sceneTime = toTime(++sceneFrame);
+    }
+
+    private final void paint() {
+        if(!isActive) {
+            return;
         }
         // オブジェクトを宣言した順に描画を行う
         for(GameObject object : objects) {
             object.draw();
         }
-        sceneTime = toTime(++sceneFrame);
     }
 
     protected abstract Scene dispose();

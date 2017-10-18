@@ -1,4 +1,4 @@
- import java.io.*;                   // ファイルの読み書き
+import java.io.*;                   // ファイルの読み書き
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,21 +26,24 @@ private InputListner inputListener;
 private PApplet applet = this;
 // キーを覚える配列（同時押し用）
 private ArrayList<Boolean> keyStatus;
-private float displayScale, marginScale, widthMargin, heightMargin;
+private static float DISPLAY_SCALE, DISPLAY_MAX_SCALE, WIDTH_MARGIN, HEIGHT_MARGIN;
 
 private static final int FRAME_RATE = 60;
 private static final int BASE_FRAME_RATE = 60;
 private static final int BASE_WIDTH = 1280;
 private static final int BASE_HEIGHT = 800;
 // フレーム単位の処理を補助するタイマー
-private FrameTimer frameTimer = new FrameTimer();
+private FrameTimer frameTimer;
 // デバッグ用平均FPS表示関数
 private FrameRate debugFramerate = new FrameRate(FRAME_RATE);
+private enum NumType {RELATIVE, ABSOLUTE}
 private enum LoopType {RESTART, YOYO, RETURN}
-private enum ParameterType {ALPHA, SCALE, POSITION}
+private enum ParameterType {ALPHA, SCALE, POSITION, SIZE}
+
+private boolean hasLoadedMainScene;
 
 public void setup() {
-    // MacBook Pro 13インチのデフォルトより1段階低い解像度
+    // MacBook Pro 13インチのデフォルトより1段階低い解像aa度
     // GPUパワーを使うためP2Dレンダーを使用
     // !!!FX2Dレンダーはフォントが設定できなくなるので断念
     size(1280, 800, P2D);
@@ -50,15 +53,15 @@ public void setup() {
     float heightScale = (float)height / (float)BASE_HEIGHT;
     // 拡大倍率が低い方を全体スケーリングにすることで部品のはみ出しを防ぐ
     if(widthScale < heightScale) {
-        displayScale = widthScale;
-        marginScale = heightScale;
-        widthMargin = 0.0f;
-        heightMargin = (height - BASE_HEIGHT * displayScale) / 2.0f;
+        DISPLAY_SCALE = widthScale;
+        DISPLAY_MAX_SCALE = heightScale;
+        WIDTH_MARGIN = 0.0f;
+        HEIGHT_MARGIN = (height - BASE_HEIGHT * DISPLAY_SCALE) / 2.0f;
     } else {
-        displayScale = heightScale;
-        marginScale = widthScale;
-        widthMargin = (width - BASE_WIDTH * displayScale) / 2.0f;
-        heightMargin = 0.0f;
+        DISPLAY_SCALE = heightScale;
+        DISPLAY_MAX_SCALE = widthScale;
+        WIDTH_MARGIN = (width - BASE_WIDTH * DISPLAY_SCALE) / 2.0f;
+        HEIGHT_MARGIN = 0.0f;
     }
     //fullScreen(P2D);
     pixelDensity(displayDensity());    //retina解像度に対応
@@ -68,11 +71,14 @@ public void setup() {
     //smooth(4);
     colorMode(HSB, 255.0f, 255.0f, 255.0f, 1.0f);
     font0 = createFont("PrestigeEliteStd-Bd", 70, true);
+    frameTimer = new FrameTimer();
     subScene = new SetupScene();
 }
 
 public void draw() {
-
+    if(!hasLoadedMainScene) {
+        return;
+    }
     // デバッグ用FPS表示措置 ////////////////////////////////////////
     debugFramerate.Update();
     surface.setTitle(debugFramerate.fps + "fps");
@@ -80,15 +86,16 @@ public void draw() {
     // 入力されたキーの処理を行う
     inputListener.manageInput();
     // 各画面の管理、描画
-    if(mainScene != null) {
+    int diffFrame = frameTimer.getDiffFrame();
+    for(int i = 0; i < diffFrame; i++) {
         mainScene.process();
+        subScene.process();
     }
     // 画面切り替えの際にオーバーレイする画面の管理、描画
     // メイン画面切り替えの際のつなぎ目として動作する
     // 普段は描画を行わない
-    if(subScene != null) {
-        subScene.process();
-    }
+    mainScene.paint();
+    subScene.paint();
 }
 
 // キーボードを押した時の処理（メインクラスでしか記述できないため）

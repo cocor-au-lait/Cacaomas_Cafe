@@ -1,6 +1,13 @@
 private class ImageObject extends GameObject {
-    private PImage file;
+    private PImage image;
+    private int filter;
+    private float filterSize;
     private int mode = CORNER;
+    private float wipePosX, wipePosY, wipeSizeX, wipeSizeY;
+
+    private ImageObject() {
+        colors = color(255);
+    }
 
     @Override
     public ImageObject clone(){
@@ -8,7 +15,7 @@ private class ImageObject extends GameObject {
         try {
             object = (ImageObject)super.clone();
             object.states = new HashMap<String, State>(this.states);
-            object.subStates = new ArrayList<State>(this.subStates);
+            //object.subStates = new ArrayList<State>(this.subStates);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -17,20 +24,83 @@ private class ImageObject extends GameObject {
 
     private void setMode(int mode) {
         this.mode = mode;
+        adjustParameter();
     }
 
-    protected final void setImage(String filename) {
-        file = loadImage(filename);
-        sizeX = file.width;
-        sizeY = file.height;
-        colors = color(255);
+    private void setImage(String filename) {
+        image = loadImage(filename);
+        sizeX = image.width;
+        sizeY = image.height;
+        wipeSizeX = image.width;
+        wipeSizeY = image.height;
+        adjustParameter();
+    }
+
+    private void setWipe(float wipePosX, float wipePosY, float wipeSizeX, float wipeSizeY) {
+        this.wipePosX = wipePosX;
+        this.wipePosY = wipePosY;
+        this.wipeSizeX = wipeSizeX;
+        this.wipeSizeY = wipeSizeY;
+    }
+
+    @Override
+    protected void adjustParameter() {
+        if(isFreeRef) {
+            return;
+        }
+        // アンカー座標がテキストボックスの中心になるように設定をする
+        switch(mode) {
+        case CORNER:
+            posRX = posX + sizeX / 2.0f;
+            posRY = posY + sizeY / 2.0f;
+            break;
+        case CENTER:
+            posRX = posX;
+            posRY = posY;
+            break;
+        case CORNERS:
+            posX2 = posX + (posX2 - posX/*size*/) / 2;
+            posY2 = posY + (posY2 - posY/*size*/) / 2;
+            break;
+        }
     }
 
     @Override
     protected void concreteDraw() {
+        pushMatrix();
+        translate(posRX, posRY);
+        rotate(rotation);
+        popMatrix();
         tint(colors, alpha);
         imageMode(mode);
-        image(file, posX, posY, sizeX, sizeY);
+
+        float diffX = (sizeX * (scale - 1.0f)) / 2.0f;
+        float diffY = (sizeY * (scale - 1.0f)) / 2.0f;
+        float realPosX, realPosY, realPosX2, realPosY2, realSizeX, realSizeY;
+        switch(mode) {
+        case CORNER:
+            realPosX = (posX - diffX) * DISPLAY_SCALE + WIDTH_MARGIN;
+            realPosY = (posY - diffY) * DISPLAY_SCALE + HEIGHT_MARGIN;
+            realSizeX = sizeX * scale * DISPLAY_SCALE;
+            realSizeY = sizeY * scale * DISPLAY_SCALE;
+            image(image, realPosX, realPosY, realSizeX, realSizeY);
+            break;
+        case CENTER:
+            realPosX = posX * DISPLAY_SCALE + WIDTH_MARGIN;
+            realPosY = posY * DISPLAY_SCALE + HEIGHT_MARGIN;
+            realSizeX = sizeX * scale * DISPLAY_SCALE;
+            realSizeY = sizeY * scale * DISPLAY_SCALE;
+            image(image, realPosX, realPosY, realSizeX, realSizeY);
+            break;
+        case CORNERS:
+            realPosX = (posX - diffX) * DISPLAY_SCALE + WIDTH_MARGIN;
+            realPosY = (posY - diffY) * DISPLAY_SCALE + HEIGHT_MARGIN;
+            realPosX2 = (posX + diffX) * DISPLAY_SCALE + WIDTH_MARGIN;
+            realPosY2 = (posY + diffY) * DISPLAY_SCALE + HEIGHT_MARGIN;
+            image(image, realPosX, realPosY, realPosX2, realPosY2);
+            break;
+        };
+
         noTint();
     }
 }

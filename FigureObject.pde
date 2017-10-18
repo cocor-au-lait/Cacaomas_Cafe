@@ -1,9 +1,10 @@
 private class FigureObject extends GameObject {
-    private float strokeWeight, strokeAlpha;
+    /*private float strokeWeight, strokeAlpha;
     private color strokeColors;
-    private int strokeJoin, strokeCap;
+    private int strokeJoin, strokeCap;*/
     private boolean canFill, canStroke;
     private int mode = CORNER;
+    private int cornerNum = 4;
 
     private  FigureObject() {
         canFill = true;
@@ -16,7 +17,7 @@ private class FigureObject extends GameObject {
         try {
             object = (FigureObject)super.clone();
             object.states = new HashMap<String, State>(this.states);
-            object.subStates = new ArrayList<State>(this.subStates);
+            //object.subStates = new ArrayList<State>(this.subStates);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -84,27 +85,93 @@ private class FigureObject extends GameObject {
 
     private void setMode(int mode) {
         this.mode = mode;
+        adjustParameter();
+    }
+
+    private void setCornerNum(int num) {
+        this.cornerNum = num;
+    }
+
+    @Override
+    protected void adjustParameter() {
+        if(isFreeRef) {
+            return;
+        }
+        // アンカー座標がテキストボックスの中心になるように設定をする
+        switch(mode) {
+        case CORNER:
+            posRX = posX + sizeX / 2.0f;
+            posRY = posY + sizeY / 2.0f;
+            break;
+        case CENTER:
+            posRX = posX;
+            posRY = posY;
+            break;
+        case CORNERS:
+            posX2 = posX + (posX2 - posX/*size*/) / 2;
+            posY2 = posY + (posY2 - posY/*size*/) / 2;
+            break;
+        }
     }
 
     // 実装メソッド
     @Override
     protected void concreteDraw() {
+        pushMatrix();
+        translate(posRX, posRY);
+        rotate(rotation);
+        popMatrix();
+
         if(canFill) {
             fill(colors, alpha);
         } else {
             noFill();
         }
         if(canStroke) {
-            stroke(strokeColors, strokeAlpha);
+            //stroke(strokeColors, strokeAlpha);
         } else {
             noStroke();
         }
-        /*beginShape();
-        for (int i = 0; i < vertexNum; i++) {
-            vertex(size * cos(radians(360 * i / vertexNum)), size * sin(radians(360 * i / vertexNum)));
-        }
-        endShape(CLOSE);*/
+
         rectMode(mode);
-        rect(posX, posY, sizeX, sizeY);
+
+        float diffX = (sizeX * (scale - 1.0f)) / 2.0f;
+        float diffY = (sizeY * (scale - 1.0f)) / 2.0f;
+        float realPosX, realPosY, realPosX2, realPosY2, realSizeX, realSizeY;
+        switch(mode) {
+        case CORNER:
+            realPosX = (posX - diffX) * DISPLAY_SCALE + WIDTH_MARGIN;
+            realPosY = (posY - diffY) * DISPLAY_SCALE + HEIGHT_MARGIN;
+            realSizeX = sizeX * scale * DISPLAY_SCALE;
+            realSizeY = sizeY * scale * DISPLAY_SCALE;
+            if(cornerNum == 4) {
+                rect(realPosX, realPosY, realSizeX, realSizeY);
+            } else {
+                ellipse(realPosX, realPosY, realSizeX, realSizeY);
+            }
+            break;
+        case CENTER:
+            realPosX = posX * DISPLAY_SCALE + WIDTH_MARGIN;
+            realPosY = posY * DISPLAY_SCALE + HEIGHT_MARGIN;
+            realSizeX = sizeX * scale * DISPLAY_SCALE;
+            realSizeY = sizeY * scale * DISPLAY_SCALE;
+            if(cornerNum == 4) {
+                rect(realPosX, realPosY, realSizeX, realSizeY);
+            } else {
+                ellipse(realPosX, realPosY, realSizeX, realSizeY);
+            }
+            break;
+        case CORNERS:
+            realPosX = (posX - diffX) * DISPLAY_SCALE + WIDTH_MARGIN;
+            realPosY = (posY - diffY) * DISPLAY_SCALE + HEIGHT_MARGIN;
+            realPosX2 = (posX + diffX) * DISPLAY_SCALE + WIDTH_MARGIN;
+            realPosY2 = (posY + diffY) * DISPLAY_SCALE + HEIGHT_MARGIN;
+            if(cornerNum == 4) {
+                rect(realPosX, realPosY, realPosX2, realPosY2);
+            } else {
+                ellipse(realPosX, realPosY, realPosX2, realPosY2);
+            }
+            break;
+        }
     }
 }

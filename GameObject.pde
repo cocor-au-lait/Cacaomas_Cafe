@@ -1,28 +1,27 @@
 private abstract class GameObject implements Cloneable {
-    private boolean isActive, isFreeRef;
-    protected float posX, posY, sizeX, sizeY, posRX, posRY, rotation;
+    protected boolean isActive, isFreeRef;
+    protected float posX, posY, posX2, posY2, sizeX, sizeY, posRX, posRY, rotation;
     protected float scale = 1.0f;
     protected float alpha = 1.0f;
     private int blend = BLEND;
     protected color colors;
     private String groupName;
     protected HashMap<String, State> states = new HashMap<String, State>();
-    protected ArrayList<State> subStates = new ArrayList<State>();
+    //protected ArrayList<State> subStates = new ArrayList<State>();
 
     protected final boolean isActive() {
         return isActive;
     }
-
+    /*
     protected final void setFreeRef(boolean isFreeRef) {
         this.isFreeRef = isFreeRef;
-    }
+        adjustParameter();
+    }*/
 
     protected final void setPosition(float posX, float posY) {
         this.posX = posX;
         this.posY = posY;
-        if(!isFreeRef) {
-            setRefPosition(posX + sizeX / 2, posY + sizeY / 2);
-        }
+        adjustParameter();
     }
 
     protected final float[] getPosition() {
@@ -30,12 +29,21 @@ private abstract class GameObject implements Cloneable {
         return position;
     }
 
+    private final void setPosition2(float posX2, float posY2) {
+        this.posX2 = posX2;
+        this.posY2 = posY2;
+        adjustParameter();
+    }
+
+    protected final float[] getPosition2() {
+        float[] position2 = {posX2, posY2};
+        return position2;
+    }
+
     protected final void setSize(float sizeX, float sizeY) {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
-        if(!isFreeRef) {
-            setRefPosition(posX + sizeX / 2, posY + sizeY / 2);
-        }
+        adjustParameter();
     }
 
     protected final float[] getSize() {
@@ -44,6 +52,10 @@ private abstract class GameObject implements Cloneable {
     }
 
     protected final void setScale(float scale) {
+        if(scale < 0.0f) {
+            println("Error:scale can't support under 0.0f");
+            this.scale = 0.0f;
+        }
         this.scale = scale;
     }
 
@@ -51,10 +63,12 @@ private abstract class GameObject implements Cloneable {
         return scale;
     }
 
+    /*
     protected final void setRefPosition(float posRX, float posRY) {
         this.posRX = posRX;
         this.posRY = posRY;
-    }
+        adjustParameter();
+    }*/
 
     protected final float[] getRefPosition() {
         float[] refPosition = {posRX, posRY};
@@ -106,25 +120,16 @@ private abstract class GameObject implements Cloneable {
         isActive = true;
     }
 
-    protected final void enable(String name) {
-        isActive = true;
-        if(states.get(name) == null) {
-            println("No such state");
-            return;
-        }
-        states.get(name).enter();
-    }
-
     protected final void startState(String name) {
         isActive = true;
         if(states.get(name) == null) {
-            println("No such state");
+            println("Error:No such state");
             return;
         }
         states.get(name).enter();
     }
 
-    protected final void checkState() {
+    protected final void updateState() {
         if(!isActive) {
             return;
         }
@@ -134,9 +139,9 @@ private abstract class GameObject implements Cloneable {
         for(Entry<String, State> entry : states.entrySet()) {
             entry.getValue().update();
         }
-        for(State subState : subStates) {
+        /*for(State subState : subStates) {
             subState.update();
-        }
+        }*/
     }
 /*
     protected final void transitionState(String name) {
@@ -244,17 +249,14 @@ private abstract class GameObject implements Cloneable {
             return;
         }
         blendMode(blend);
-        pushMatrix();
         // 回転軸座標を図形の中心に移動
-        //translate(posRX, posRY);
-        //rotate(rotation);
         concreteDraw();
         // 座標軸とブレンドモードを戻す
-        popMatrix();
         blendMode(BLEND);
     }
 
     protected abstract void concreteDraw();
+    protected abstract void adjustParameter();
 }
 
 /*

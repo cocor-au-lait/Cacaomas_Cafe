@@ -5,22 +5,21 @@ private class SetupScene extends Scene {
         background.setSize(BASE_WIDTH, BASE_HEIGHT);
 
         final TextObject creditTitle = new TextObject();
-        creditTitle.setPosition(BASE_WIDTH / 2, (BASE_HEIGHT / 5) * 2);
+        creditTitle.setPosition(BASE_WIDTH / 2, 250);
         creditTitle.setText("Project\nCacaomas_Cafe");
         creditTitle.setTextSize(70);
         creditTitle.setFont(font0);
-        creditTitle.setScale(1.0f);
         creditTitle.setColor(color(255));
         creditTitle.setAlpha(0.0f);
-        creditTitle.setAlign(CENTER, BASELINE);
+        creditTitle.setAlign(CENTER, TOP);
 
         final TextObject creditDetail = creditTitle.clone();
-        creditDetail.setPosition(BASE_WIDTH / 2, (BASE_HEIGHT / 5) * 3.4f);
+        creditDetail.setPosition(BASE_WIDTH / 2, 450);
         creditDetail.setText("UNDER DEVELOPMENT");
         creditDetail.setTextSize(40);
 
         final TextObject creditCopyright = creditTitle.clone();
-        creditCopyright.setPosition(BASE_WIDTH / 2, (BASE_HEIGHT / 5) * 4);
+        creditCopyright.setPosition(BASE_WIDTH / 2, 550);
         creditCopyright.setText("©️2017 Jun Koyama");
         creditCopyright.setTextSize(20);
 
@@ -47,48 +46,45 @@ private class SetupScene extends Scene {
                 switch(keyTime) {
                 case 0:
                     background.enable();
+                    creditTitle.enable();
+                    creditDetail.enable();
+                    creditCopyright.enable();
                     break;
                 case 1000/*ms*/:
                     creditTitle.startState("fade");
                     creditDetail.startState("fade");
                     creditCopyright.startState("fade");
                     break;
-                case 3500/*ms*/:
-                    if(hasLoaded() && mainScene.hasLoaded()) {
-                        creditTitle.disable();
-                        creditDetail.disable();
-                        creditCopyright.disable();
-                    }
-                    exitSequence();
+                }
+                if(keyTime > 3500 && mainScene.hasLoaded() && hasLoaded()) {
+                    dispose();
                 }
             }
-            @Override
-            void onExit() {
-                subScene.dispose();
-            }
         };
-        sequences.add(creditSequence);
-        creditSequence.startSequence();
-        startScene();
+        sequences.put("creditSQ", creditSequence);
     }
     // バックグラウンド処理はこちら側に書く
     public void run() {
         inputListener = new InputListner();
+        minim = new Minim(applet);
+        mainScene = new TitleScene();
+        hasLoadedMainScene = true;
+        sequences.get("creditSQ").startSequence();
+        startScene();
         inputListener.start();
         //bms = new BmsController();
-        minim = new Minim(applet);
+
         //////////////////////////////////////////////////////
         // データベースの設定
         db = new SQLite(applet, "database.db");
         font1 = createFont("Apple Chancery", 50, true);
         font2 = createFont("Ayuthaya", 50, true);
-        mainScene = new TitleScene();
     }
     // シーンを抜ける時の処理
     @Override
     protected Scene dispose() {
         mainScene.startScene();
-        subScene = null;
+        stopScene();
         return this;
     }
 }
