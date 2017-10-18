@@ -24,6 +24,12 @@ private float getAntiRatio(float elapsion, int duration, Easing easing) {
     return ratio;
 }
 
+private void enableObjects(GameObject ... objects) {
+    for(GameObject object : objects) {
+        object.enable();
+    }
+}
+
 /*
 private class FrameCounter {
     private int elapsedFrame;

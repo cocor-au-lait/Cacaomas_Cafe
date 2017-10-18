@@ -8,18 +8,16 @@ private class TitleScene extends Scene {
         logo.setImage("image/parts/black_logo.png");
         logo.setMode(CENTER);
         logo.setPosition(BASE_WIDTH / 2, 200);
-        logo.setAlpha(0.0f);
         logo.addState("fade", new TweenState(logo, ParameterType.ALPHA)
-            .setTween(1.0f, 500));
+            .setTween(0.0f, 1.0f, 500));
 
         final ImageObject wallpaper = new ImageObject();
         wallpaper.setImage("image/background/title.png");
         wallpaper.setMode(CENTER);
         wallpaper.setPosition(BASE_WIDTH / 2, BASE_HEIGHT / 2);
         //wallpaper.setScale(0.5f);
-        wallpaper.setAlpha(0.0f);
         wallpaper.addState("fade", new TweenState(wallpaper, ParameterType.ALPHA)
-            .setTween(1.0f, 500));
+            .setTween(0.0f, 1.0f, 500));
         /*
         rotater = new RotateFigureObject[5];
         rotater[0] = new RotateFigureObject(0.22f, LEFT);
@@ -41,13 +39,12 @@ private class TitleScene extends Scene {
         final TextObject mainText = new TextObject();
         mainText.setFont(font0);
         mainText.setColor(color(0));
-        mainText.setAlpha(0.0f);
         mainText.setAlign(CENTER, TOP);
         mainText.setText("Pless START key to start");
-        mainText.setPosition(width / 2, 670);
+        mainText.setPosition(BASE_WIDTH / 2, 670);
         mainText.setTextSize(35);
         mainText.addState("flashLoop", new TweenState(mainText, ParameterType.ALPHA)
-            .setTween(1.0f, 500)
+            .setTween(0.0f, 1.0f, 500)
             .setLoop(-1, LoopType.YOYO, 200));
 
         final FigureObject circle = new FigureObject();
@@ -55,18 +52,14 @@ private class TitleScene extends Scene {
         circle.setBlend(ADD);
         circle.setColor(color(40));
         circle.setSize(100, 100);
-        circle.setPosition(100, 100);
         circle.setMode(CENTER);
         circle.addState("loop", new TweenState(circle, ParameterType.POSITION)
-            .setTween(1000, 500, 3000)
+            .setTween(100, 100, 1000, 500, 3000)
             .setLoop(-1, LoopType.YOYO, 0)
             .setEasing(new EasingInOutCirc()));
 
         // レイヤー
-        objects.add(wallpaper);
-        objects.add(circle);
-        objects.add(logo);
-        objects.add(mainText);
+        objects = Arrays.asList(wallpaper, circle, logo, mainText);
 
         // シーケンス
         final Sequence enterSequence = new Sequence() {
@@ -83,6 +76,7 @@ private class TitleScene extends Scene {
                     //controllable = true;
                     bgm.loop();
                     exitSequence(sequences.get("idleSQ"));
+                    break;
                 }
             }
         };
@@ -110,6 +104,7 @@ private class TitleScene extends Scene {
 
     @Override
     protected Scene dispose() {
-        return this;
+        bgScene.startScene();
+        return new EntryScene();
     }
 }

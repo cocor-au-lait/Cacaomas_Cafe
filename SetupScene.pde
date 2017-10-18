@@ -3,6 +3,7 @@ private class SetupScene extends Scene {
         // オブジェクトの生成（順不同）
         final FigureObject background = new FigureObject();
         background.setSize(BASE_WIDTH, BASE_HEIGHT);
+        background.enable();
 
         final TextObject creditTitle = new TextObject();
         creditTitle.setPosition(BASE_WIDTH / 2, 250);
@@ -10,7 +11,6 @@ private class SetupScene extends Scene {
         creditTitle.setTextSize(70);
         creditTitle.setFont(font0);
         creditTitle.setColor(color(255));
-        creditTitle.setAlpha(0.0f);
         creditTitle.setAlign(CENTER, TOP);
 
         final TextObject creditDetail = creditTitle.clone();
@@ -24,44 +24,39 @@ private class SetupScene extends Scene {
         creditCopyright.setTextSize(20);
 
         // レイヤー（描画する順に追加）
-        objects.add(background);
-        objects.add(creditTitle);
-        objects.add(creditDetail);
-        objects.add(creditCopyright);
+        objects = Arrays.asList(background, creditTitle, creditDetail, creditCopyright);
 
-        for(GameObject object : objects) {
-            object.addState("fade", new TweenState(object, ParameterType.ALPHA)
-                .setTween(1.0f, 500)
-                .setLoop(0, LoopType.YOYO, 1000));
-        }
+        // グルーピング
+        final GroupObject credit = new GroupObject(creditTitle, creditDetail, creditCopyright);
+        //credit.setAlpha(0.0f);
+        credit.addState("fade", new TweenState(ParameterType.ALPHA)
+            .setTween(0.0f, 1.0f, 500)
+            .setLoop(0, LoopType.YOYO, 1000));
 
         // まとめて扱えるようグループ化
         //GroupObject creditTexts = new GroupObject(creditTitle, creditDetail. creditCopyright);
 
         // シーケンスの生成
-        Sequence creditSequence = new Sequence() {
+        final Sequence creditSequence = new Sequence() {
             @Override
             void executeSchedule() {
                 // ！！！注意：50ms以上で判定を行うこと
                 switch(keyTime) {
                 case 0:
-                    background.enable();
-                    creditTitle.enable();
-                    creditDetail.enable();
-                    creditCopyright.enable();
+                    credit.enable();
                     break;
-                case 1000/*ms*/:
-                    creditTitle.startState("fade");
-                    creditDetail.startState("fade");
-                    creditCopyright.startState("fade");
+                case 1500/*ms*/:
+                    credit.startState("fade");
                     break;
                 }
-                if(keyTime > 3500 && mainScene.hasLoaded() && hasLoaded()) {
+                if(keyTime > 4000 && mainScene.hasLoaded() && hasLoaded()) {
                     dispose();
                 }
             }
         };
         sequences.put("creditSQ", creditSequence);
+        sequences.get("creditSQ").startSequence();
+        startScene();
     }
     // バックグラウンド処理はこちら側に書く
     public void run() {
@@ -69,16 +64,17 @@ private class SetupScene extends Scene {
         minim = new Minim(applet);
         mainScene = new TitleScene();
         hasLoadedMainScene = true;
-        sequences.get("creditSQ").startSequence();
-        startScene();
         inputListener.start();
         //bms = new BmsController();
 
         //////////////////////////////////////////////////////
         // データベースの設定
         db = new SQLite(applet, "database.db");
-        font1 = createFont("Apple Chancery", 50, true);
-        font2 = createFont("Ayuthaya", 50, true);
+        appleChancery = createFont("Apple Chancery", 100, true);
+        bickham = createFont("Bickham Script Pro 3", 150, true);
+        ayuthaya = createFont("Ayuthaya", 100, true);
+        athelas = createFont("Athelas", 100, true);
+        baoli = createFont("Baoli SC", 100, true);
     }
     // シーンを抜ける時の処理
     @Override

@@ -5,13 +5,12 @@ private class DefaultTransition extends Scene {
         final FigureObject background = new FigureObject();
         background.setColor(color(#553D2A));
         background.setMode(CORNERS);
-        background.setPosition(0, BASE_HEIGHT);
-        background.setSize(BASE_WIDTH, BASE_HEIGHT);
+        background.setPosition2(BASE_WIDTH, BASE_HEIGHT);
         background.addState("enter", new TweenState(background, ParameterType.POSITION)
-            .setTween(0, 0, 1300)
+            .setTween(0, BASE_HEIGHT, 0, 0, 1300)
             .setEasing(new EasingInCirc()));
         background.addState("exit", new TweenState(background, ParameterType.POSITION)
-            .setTween(0, BASE_HEIGHT, 400)
+            .setFreakyTween(0, BASE_HEIGHT, 800)
             .setEasing(new EasingOutExpo()));
 
         final ImageObject logo = new ImageObject();
@@ -19,19 +18,18 @@ private class DefaultTransition extends Scene {
         logo.setMode(CORNER);
         logo.setPosition(880, 660);
         logo.setSize(362, 110);
-        logo.setAlpha(0.0f);
-        logo.setScale(3.0f);
         logo.addState("fadeInA", new TweenState(logo, ParameterType.ALPHA)
-            .setTween(1.0f, 400)
+            .setTween(0.0f, 1.0f, 400)
             .setEasing(new EasingOutExpo()));
         logo.addState("fadeInS", new TweenState(logo, ParameterType.SCALE)
-            .setTween(1.0f, 400)
+            .setTween(3.0f, 1.0f, 400)
             .setEasing(new EasingOutExpo()));
         logo.addState("fadeOutA", new TweenState(logo, ParameterType.ALPHA)
-            .setTween(0.0f, 200));
+            .setFreakyTween(0.0f, 200));
 
-        objects.add(background);
-        objects.add(logo);
+        objects = Arrays.asList(background, logo);
+        /*objects.add(background);
+        objects.add(logo);*/
 
         sequences.put("enterSQ", new Sequence() {
             @Override
@@ -73,7 +71,7 @@ private class DefaultTransition extends Scene {
                     mainScene.startScene();
                     background.startState("exit");
                     break;
-                case 500:
+                case 1500:
                     dispose();
                 }
             }
@@ -83,7 +81,7 @@ private class DefaultTransition extends Scene {
 
     @Override
     protected Scene dispose() {
-        subScene = null;
+        stopScene();
         return this;
     }
 }
