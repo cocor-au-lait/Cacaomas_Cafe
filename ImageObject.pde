@@ -59,8 +59,8 @@ private class ImageObject extends GameObject {
             posRY = posY;
             break;
         case CORNERS:
-            posX2 = posX + (posX2 - posX/*size*/) / 2;
-            posY2 = posY + (posY2 - posY/*size*/) / 2;
+            posRX = posX + (posX2 - posX/*size*/) / 2;
+            posRY = posY + (posY2 - posY/*size*/) / 2;
             break;
         }
     }
@@ -95,8 +95,8 @@ private class ImageObject extends GameObject {
         case CORNERS:
             realPosX = (posX - diffX) * DISPLAY_SCALE + WIDTH_MARGIN;
             realPosY = (posY - diffY) * DISPLAY_SCALE + HEIGHT_MARGIN;
-            realPosX2 = (posX + diffX) * DISPLAY_SCALE + WIDTH_MARGIN;
-            realPosY2 = (posY + diffY) * DISPLAY_SCALE + HEIGHT_MARGIN;
+            realPosX2 = (posX2 + diffX) * DISPLAY_SCALE + WIDTH_MARGIN;
+            realPosY2 = (posY2 + diffY) * DISPLAY_SCALE + HEIGHT_MARGIN;
             image(image, realPosX, realPosY, realPosX2, realPosY2);
             break;
         };

@@ -4,7 +4,7 @@ private abstract class Scene implements Runnable {
     private boolean isActive;
     private int sceneFrame;
     protected int sceneTime;
-    protected ArrayList<GameObject> objects = new ArrayList<GameObject>();
+    protected List<GameObject> objects = new ArrayList<GameObject>();
     protected HashMap<String, Sequence> sequences = new HashMap<String, Sequence>();
 
     private Scene() {

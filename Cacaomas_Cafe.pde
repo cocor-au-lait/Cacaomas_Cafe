@@ -1,10 +1,9 @@
 import java.io.*;                   // ファイルの読み書き
 import java.math.BigDecimal;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 
+import processing.video.*;
 import ddf.minim.*;
 import processing.sound.*;
 import org.gamecontrolplus.*;       // ゲームパッド用
@@ -16,11 +15,11 @@ import de.bezier.data.sql.*;        // データベース用
 // データベース管理
 private SQLite db;
 // ###加えて各ステートで使うフォントを読み込ませる
-private PFont font0, font1, font2, font3;
+private PFont font0, appleChancery, bickham, ayuthaya, athelas, baoli;
 // 音楽ファイルコア（画面遷移の際にも音が再生できるようにグローバル変数として設定）
 private Minim minim;
 // ポリモーフィズムを利用して各画面を構成
-private Scene mainScene, subScene;
+private Scene mainScene, subScene, bgScene;
 // ボタン、キーボードの監視クラス
 private InputListner inputListener;
 private PApplet applet = this;
@@ -40,7 +39,9 @@ private enum NumType {RELATIVE, ABSOLUTE}
 private enum LoopType {RESTART, YOYO, RETURN}
 private enum ParameterType {ALPHA, SCALE, POSITION, SIZE}
 
-private boolean hasLoadedMainScene;
+private boolean hasLoadedMainScene, hasLoadedBackgroundScene;
+
+private ArrayList<PlayerData> playerDate = new ArrayList<PlayerData>();
 
 public void setup() {
     // MacBook Pro 13インチのデフォルトより1段階低い解像aa度
@@ -48,6 +49,8 @@ public void setup() {
     // !!!FX2Dレンダーはフォントが設定できなくなるので断念
     size(1280, 800, P2D);
     //frame.setResizable(true);
+    //fullScreen(P2D);
+    pixelDensity(displayDensity());    //retina解像度に対応
     // 画面サイズの調節
     float widthScale = (float)width / (float)BASE_WIDTH;
     float heightScale = (float)height / (float)BASE_HEIGHT;
@@ -63,8 +66,6 @@ public void setup() {
         WIDTH_MARGIN = (width - BASE_WIDTH * DISPLAY_SCALE) / 2.0f;
         HEIGHT_MARGIN = 0.0f;
     }
-    //fullScreen(P2D);
-    pixelDensity(displayDensity());    //retina解像度に対応
 
     //noCursor();
     frameRate(FRAME_RATE);
@@ -72,11 +73,12 @@ public void setup() {
     colorMode(HSB, 255.0f, 255.0f, 255.0f, 1.0f);
     font0 = createFont("PrestigeEliteStd-Bd", 70, true);
     frameTimer = new FrameTimer();
+    bgScene = new BackgroundScene();
     subScene = new SetupScene();
 }
 
 public void draw() {
-    if(!hasLoadedMainScene) {
+    if(!hasLoadedMainScene || !hasLoadedBackgroundScene) {
         return;
     }
     // デバッグ用FPS表示措置 ////////////////////////////////////////
@@ -88,14 +90,20 @@ public void draw() {
     // 各画面の管理、描画
     int diffFrame = frameTimer.getDiffFrame();
     for(int i = 0; i < diffFrame; i++) {
+        bgScene.process();
         mainScene.process();
         subScene.process();
     }
     // 画面切り替えの際にオーバーレイする画面の管理、描画
     // メイン画面切り替えの際のつなぎ目として動作する
     // 普段は描画を行わない
+    bgScene.paint();
     mainScene.paint();
     subScene.paint();
+}
+
+void movieEvent(Movie m) {
+  m.read();
 }
 
 // キーボードを押した時の処理（メインクラスでしか記述できないため）
