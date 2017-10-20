@@ -4,46 +4,25 @@ private class TitleScene extends Scene {
         final SoundFile se = new SoundFile(applet, "sound/se/enter.mp3");
         se.amp(0.5f);
         // オブジェクト
-        final ImageObject logo = new ImageObject();
-        logo.setImage("image/parts/black_logo.png");
+        final ImageObject logo = new ImageObject("image/parts/black_logo.png");
         logo.setMode(CENTER);
         logo.setPosition(BASE_WIDTH / 2, 200);
-        logo.addState("fade", new TweenState(logo, ParameterType.ALPHA)
+        logo.addState("fade", new TweenState(ParameterType.ALPHA)
             .setTween(0.0f, 1.0f, 500));
 
-        final ImageObject wallpaper = new ImageObject();
-        wallpaper.setImage("image/background/title.png");
+        final ImageObject wallpaper = new ImageObject("image/background/title.png");
         wallpaper.setMode(CENTER);
         wallpaper.setPosition(BASE_WIDTH / 2, BASE_HEIGHT / 2);
-        //wallpaper.setScale(0.5f);
-        wallpaper.addState("fade", new TweenState(wallpaper, ParameterType.ALPHA)
+        wallpaper.addState("fade", new TweenState(ParameterType.ALPHA)
             .setTween(0.0f, 1.0f, 500));
-        /*
-        rotater = new RotateFigureObject[5];
-        rotater[0] = new RotateFigureObject(0.22f, LEFT);
-        rotater[0].setPosition(162, 96);
-        rotater[0].setSize(322, 322);
-        rotater[1] = new RotateFigureObject(0.2f, RIGHT);
-        rotater[1].setPosition(52, 372);
-        rotater[1].setSize(256, 256);
-        rotater[2] = new RotateFigureObject(0.15f, RIGHT);
-        rotater[2].setPosition(578, -87);
-        rotater[2].setSize(390, 390);
-        rotater[3] = new RotateFigureObject(0.25f, RIGHT);
-        rotater[3].setPosition(934, 270);
-        rotater[3].setSize(183, 183);
-        rotater[4] = new RotateFigureObject(0.19f, RIGHT);
-        rotater[4].setPosition(980, 490);
-        rotater[4].setSize(236, 236);
-        */
-        final TextObject mainText = new TextObject();
+
+        final TextObject mainText = new TextObject("Pless START key to start");
         mainText.setFont(font0);
         mainText.setColor(color(0));
         mainText.setAlign(CENTER, TOP);
-        mainText.setText("Pless START key to start");
         mainText.setPosition(BASE_WIDTH / 2, 670);
         mainText.setTextSize(35);
-        mainText.addState("flashLoop", new TweenState(mainText, ParameterType.ALPHA)
+        mainText.addState("flashLoop", new TweenState(ParameterType.ALPHA)
             .setTween(0.0f, 1.0f, 500)
             .setLoop(-1, LoopType.YOYO, 200));
 
@@ -53,7 +32,7 @@ private class TitleScene extends Scene {
         circle.setColor(color(40));
         circle.setSize(100, 100);
         circle.setMode(CENTER);
-        circle.addState("loop", new TweenState(circle, ParameterType.POSITION)
+        circle.addState("loop", new TweenState(ParameterType.POSITION)
             .setTween(100, 100, 1000, 500, 3000)
             .setLoop(-1, LoopType.YOYO, 0)
             .setEasing(new EasingInOutCirc()));
@@ -62,9 +41,9 @@ private class TitleScene extends Scene {
         objects = Arrays.asList(wallpaper, circle, logo, mainText);
 
         // シーケンス
-        final Sequence enterSequence = new Sequence() {
+        sequences.put("enterSQ", new Sequence() {
             @Override
-            protected void executeSchedule() {
+            protected void onProcess() {
                 switch(keyTime) {
                 case 0:
                     wallpaper.startState("fade");
@@ -75,35 +54,30 @@ private class TitleScene extends Scene {
                     mainText.startState("flashLoop");
                     //controllable = true;
                     bgm.loop();
-                    exitSequence(sequences.get("idleSQ"));
+                    changeSequence(sequences.get("idleSQ"));
                     break;
                 }
             }
-        };
-        sequences.put("enterSQ", enterSequence);
+        });
 
-        final Sequence idleSequence = new Sequence() {
+        sequences.put("idleSQ", new Sequence() {
             @Override
             protected void onStart() {
                 subScene = new DefaultTransition();
             }
             @Override
-            protected void executeSchedule() {
+            protected void onProcess() {
                 if(inputListener.onPressed(6)) {
                     se.play();
                     bgm.shiftGain(1, -80, 3000);
-                    subScene.startScene();
-                    exitSequence();
+                    subScene.startScene("enterSQ");
                 }
             }
-        };
-        sequences.put("idleSQ", idleSequence);
-
-        enterSequence.startSequence();
+        });
     }
 
     @Override
-    protected Scene dispose() {
+    protected Scene disposeScene() {
         bgScene.startScene();
         return new EntryScene();
     }

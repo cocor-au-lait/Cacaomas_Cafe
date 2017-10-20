@@ -1,5 +1,4 @@
-// ほとんどの場合無名クラスとして実装するものの、ディープコピーを可能とするためにAbstractは外している
-private class State implements Cloneable {
+private abstract class State implements Cloneable {
     protected GameObject object;
     protected int stateFrame;
     protected int stateTime;
@@ -12,12 +11,14 @@ private class State implements Cloneable {
     // ディープコピーを可能とするためにオーバーライド
     @Override
     public State clone() {
-        State state = new State();
+        State state = new State() {
+            @Override protected void onUpdate() {}
+        };
         try {
-           state = (State)super.clone();
-           state.object = this.object.clone();
+            state = (State)super.clone();
+            //state.object = this.object.clone();
         } catch (Exception e){
-            //e.printStackTrace();
+            e.printStackTrace();
         }
         return state;
     }
@@ -80,18 +81,18 @@ private class State implements Cloneable {
 
     protected final State setObject(GameObject object) {
         this.object = object;
-        adjustTween();
+        onSetObject();
         return this;
     }
     /**
      * サブクラスにて詳細を記述
      */
     // TweenState用
-    protected void adjustTween() {}
+    protected void onSetObject() {}
     // Stateに遷移した時に実行するメソッド
     protected void onEnter() {}
     // Stateに留まっている時に実行するメソッド
-    protected void onUpdate() {}
+    protected abstract void onUpdate();
     // Stateに遷移する時に実行するメソッド
     protected void onExit() {}
 }
@@ -111,20 +112,15 @@ private class TweenState extends State {
         TweenState state = new TweenState();
         try {
            state = (TweenState)super.clone();
-           state.object = this.object.clone();
+           //state.object = this.object.clone();
            // ???enumはcloneが必要？
         } catch (Exception e){
-            //e.printStackTrace();
+            e.printStackTrace();
         }
         return state;
     }
 
     private TweenState() {}
-
-    private TweenState(GameObject object, ParameterType type) {
-        this.object = object;
-        this.type = type;
-    }
 
     private TweenState(ParameterType type) {
         this.type = type;
@@ -177,8 +173,10 @@ private class TweenState extends State {
     }
 
     @Override
-    protected void adjustTween() {
-        setParameter(0.0f);
+    protected void onSetObject() {
+        if(!freakyParam) {
+            setParameter(0.0f);
+        }
     }
 
     @Override
@@ -218,6 +216,9 @@ private class TweenState extends State {
             firstParam[0] = size[0];
             firstParam[1] = size[1];
             break;
+        case ROTATION:
+            firstParam[0] = object.getRotation();
+            break;
         }
         paramRange[0] = lastParam[0] - firstParam[0];
         paramRange[1] = lastParam[1] - firstParam[1];
@@ -238,6 +239,9 @@ private class TweenState extends State {
         case SIZE:
             object.setSize(firstParam[0] + paramRange[0] * ratio,
                 firstParam[1] + paramRange[1] * ratio);
+            break;
+        case ROTATION:
+            object.setRotation(firstParam[0] + paramRange[0] * ratio);
             break;
         }
     }

@@ -2,9 +2,17 @@ private class TextObject extends GameObject {
     private PFont font = font0;
     private int alignX = LEFT;
     private int alignY = TOP;
-    private String string = "";
+    private String string;
     private float textSize;
     private boolean hasSize;
+
+    private TextObject() {
+        string = "";
+    }
+
+    private TextObject(String string) {
+        this.string = string;
+    }
 
     @Override
     public TextObject clone(){
