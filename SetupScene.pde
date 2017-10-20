@@ -5,22 +5,21 @@ private class SetupScene extends Scene {
         background.setSize(BASE_WIDTH, BASE_HEIGHT);
         background.enable();
 
-        final TextObject creditTitle = new TextObject();
+        final TextObject creditTitle = new TextObject("Project\nCacaomas_Cafe");
         creditTitle.setPosition(BASE_WIDTH / 2, 250);
-        creditTitle.setText("Project\nCacaomas_Cafe");
         creditTitle.setTextSize(70);
         creditTitle.setFont(font0);
         creditTitle.setColor(color(255));
         creditTitle.setAlign(CENTER, TOP);
 
         final TextObject creditDetail = creditTitle.clone();
-        creditDetail.setPosition(BASE_WIDTH / 2, 450);
         creditDetail.setText("UNDER DEVELOPMENT");
+        creditDetail.setPosition(BASE_WIDTH / 2, 450);
         creditDetail.setTextSize(40);
 
         final TextObject creditCopyright = creditTitle.clone();
-        creditCopyright.setPosition(BASE_WIDTH / 2, 550);
         creditCopyright.setText("©️2017 Jun Koyama");
+        creditCopyright.setPosition(BASE_WIDTH / 2, 550);
         creditCopyright.setTextSize(20);
 
         // レイヤー（描画する順に追加）
@@ -33,13 +32,10 @@ private class SetupScene extends Scene {
             .setTween(0.0f, 1.0f, 500)
             .setLoop(0, LoopType.YOYO, 1000));
 
-        // まとめて扱えるようグループ化
-        //GroupObject creditTexts = new GroupObject(creditTitle, creditDetail. creditCopyright);
-
         // シーケンスの生成
-        final Sequence creditSequence = new Sequence() {
+        sequences.put("creditSQ", new Sequence() {
             @Override
-            void executeSchedule() {
+            void onProcess() {
                 // ！！！注意：50ms以上で判定を行うこと
                 switch(keyTime) {
                 case 0:
@@ -50,13 +46,12 @@ private class SetupScene extends Scene {
                     break;
                 }
                 if(keyTime > 4000 && mainScene.hasLoaded() && hasLoaded()) {
-                    dispose();
+                    disposeScene();
                 }
             }
-        };
-        sequences.put("creditSQ", creditSequence);
-        sequences.get("creditSQ").startSequence();
-        startScene();
+        });
+
+        startScene("creditSQ");
     }
     // バックグラウンド処理はこちら側に書く
     public void run() {
@@ -75,11 +70,12 @@ private class SetupScene extends Scene {
         ayuthaya = createFont("Ayuthaya", 100, true);
         athelas = createFont("Athelas", 100, true);
         baoli = createFont("Baoli SC", 100, true);
+        yuGothic = createFont("YuGothic", 100, true);
     }
     // シーンを抜ける時の処理
     @Override
-    protected Scene dispose() {
-        mainScene.startScene();
+    protected Scene disposeScene() {
+        mainScene.startScene("enterSQ");
         stopScene();
         return this;
     }

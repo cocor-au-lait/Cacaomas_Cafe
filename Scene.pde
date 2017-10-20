@@ -32,11 +32,14 @@ private abstract class Scene implements Runnable {
         isActive = false;
     }
 
-    protected final void startScene() {
+    protected final void startScene(String ... sequenceNames) {
+        for(String sequenceName : sequenceNames) {
+            sequences.get(sequenceName).startSequence();
+        }
         isActive = true;
     }
 
-    private final void process() {
+    private final void processScene() {
         if(!isActive) {
             return;
         }
@@ -45,20 +48,20 @@ private abstract class Scene implements Runnable {
             object.updateState();
         }
         for(Entry<String, Sequence> entry : sequences.entrySet()) {
-            entry.getValue().process();
+            entry.getValue().processSequence();
         }
         sceneTime = toTime(++sceneFrame);
     }
 
-    private final void paint() {
+    private final void drawScene() {
         if(!isActive) {
             return;
         }
         // オブジェクトを宣言した順に描画を行う
         for(GameObject object : objects) {
-            object.draw();
+            object.drawObject();
         }
     }
 
-    protected abstract Scene dispose();
+    protected abstract Scene disposeScene();
 }

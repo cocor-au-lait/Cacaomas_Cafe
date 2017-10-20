@@ -9,29 +9,29 @@ private abstract class Sequence {
         onStart();
     }
 
-    protected final void process() {
+    protected final void processSequence() {
         if(!isActive) {
             return;
         }
-        executeSchedule();
+        onProcess();
         keyTime = toTime(++keyFrame);
     }
 
-    protected final void replay() {
+    protected final void replaySequence() {
         keyFrame = 0;
     }
 
-    protected final void exitSequence() {
+    protected final void stopSequence() {
         isActive = false;
-        onExit();
+        onStop();
     }
 
-    protected final void exitSequence(Sequence sequence) {
+    protected final void changeSequence(Sequence sequence) {
         sequence.startSequence();
-        exitSequence();
+        stopSequence();
     }
 
-    protected abstract void executeSchedule();
+    protected abstract void onProcess();
     protected void onStart() {}
-    protected void onExit() {}
+    protected void onStop() {}
 }

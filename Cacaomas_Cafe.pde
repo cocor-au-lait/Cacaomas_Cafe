@@ -15,7 +15,7 @@ import de.bezier.data.sql.*;        // データベース用
 // データベース管理
 private SQLite db;
 // ###加えて各ステートで使うフォントを読み込ませる
-private PFont font0, appleChancery, bickham, ayuthaya, athelas, baoli;
+private PFont font0, appleChancery, bickham, ayuthaya, athelas, baoli, yuGothic;
 // 音楽ファイルコア（画面遷移の際にも音が再生できるようにグローバル変数として設定）
 private Minim minim;
 // ポリモーフィズムを利用して各画面を構成
@@ -37,7 +37,7 @@ private FrameTimer frameTimer;
 private FrameRate debugFramerate = new FrameRate(FRAME_RATE);
 private enum NumType {RELATIVE, ABSOLUTE}
 private enum LoopType {RESTART, YOYO, RETURN}
-private enum ParameterType {ALPHA, SCALE, POSITION, SIZE}
+private enum ParameterType {ALPHA, SCALE, POSITION, SIZE, ROTATION}
 
 private boolean hasLoadedMainScene, hasLoadedBackgroundScene;
 
@@ -90,16 +90,16 @@ public void draw() {
     // 各画面の管理、描画
     int diffFrame = frameTimer.getDiffFrame();
     for(int i = 0; i < diffFrame; i++) {
-        bgScene.process();
-        mainScene.process();
-        subScene.process();
+        bgScene.processScene();
+        mainScene.processScene();
+        subScene.processScene();
     }
     // 画面切り替えの際にオーバーレイする画面の管理、描画
     // メイン画面切り替えの際のつなぎ目として動作する
     // 普段は描画を行わない
-    bgScene.paint();
-    mainScene.paint();
-    subScene.paint();
+    bgScene.drawScene();
+    mainScene.drawScene();
+    subScene.drawScene();
 }
 
 void movieEvent(Movie m) {

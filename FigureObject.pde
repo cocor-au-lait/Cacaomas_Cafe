@@ -119,8 +119,8 @@ private class FigureObject extends GameObject {
     protected void concreteDraw() {
         pushMatrix();
         translate(posRX, posRY);
-        rotate(rotation);
-        popMatrix();
+        rotate(radians(rotation));
+        translate(-posRX, -posRY);
 
         if(canFill) {
             fill(colors, alpha);
@@ -173,5 +173,7 @@ private class FigureObject extends GameObject {
             }
             break;
         }
+
+        popMatrix();
     }
 }

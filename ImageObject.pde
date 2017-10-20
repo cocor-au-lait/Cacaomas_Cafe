@@ -9,6 +9,11 @@ private class ImageObject extends GameObject {
         colors = color(255);
     }
 
+    private ImageObject(String filename) {
+        this();
+        setImage(filename);
+    }
+
     @Override
     public ImageObject clone(){
         ImageObject object = new ImageObject();
@@ -69,7 +74,7 @@ private class ImageObject extends GameObject {
     protected void concreteDraw() {
         pushMatrix();
         translate(posRX, posRY);
-        rotate(rotation);
+        rotate(radians(rotation));
         popMatrix();
         tint(colors, alpha);
         imageMode(mode);
