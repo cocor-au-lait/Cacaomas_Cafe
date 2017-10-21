@@ -1,8 +1,8 @@
 private class TitleScene extends Scene {
     public void run() {
-        final AudioPlayer bgm = minim.loadFile("sound/bgm/title.wav");
-        final SoundFile se = new SoundFile(applet, "sound/se/enter.mp3");
-        se.amp(0.5f);
+        //final AudioPlayer bgm = minim.loadFile("sound/bgm/title.wav");
+        //final SoundFile se = new SoundFile(applet, "sound/se/enter.mp3");
+        //se.amp(0.5f);
         // オブジェクト
         final ImageObject logo = new ImageObject("image/parts/black_logo.png");
         logo.setMode(CENTER);
@@ -46,6 +46,7 @@ private class TitleScene extends Scene {
             protected void onProcess() {
                 switch(keyTime) {
                 case 0:
+                    subScene = new DefaultTransition("Entry");
                     wallpaper.startState("fade");
                     break;
                 case 1000:
@@ -53,7 +54,9 @@ private class TitleScene extends Scene {
                     logo.startState("fade");
                     mainText.startState("flashLoop");
                     //controllable = true;
-                    bgm.loop();
+                    //bgm.loop();
+                    break;
+                case 1300:
                     changeSequence(sequences.get("idleSQ"));
                     break;
                 }
@@ -62,15 +65,12 @@ private class TitleScene extends Scene {
 
         sequences.put("idleSQ", new Sequence() {
             @Override
-            protected void onStart() {
-                subScene = new DefaultTransition();
-            }
-            @Override
             protected void onProcess() {
                 if(inputListener.onPressed(6)) {
-                    se.play();
-                    bgm.shiftGain(1, -80, 3000);
-                    subScene.startScene("enterSQ");
+                    //se.play();
+                    //bgm.shiftGain(1, -80, 3000);
+                    subScene.startScene();
+                    stopSequence();
                 }
             }
         });
@@ -78,7 +78,7 @@ private class TitleScene extends Scene {
 
     @Override
     protected Scene disposeScene() {
-        bgScene.startScene();
+        bgScene.startScene("idleSQ");
         return new EntryScene();
     }
 }

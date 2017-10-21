@@ -7,7 +7,7 @@ private abstract class Sequence {
         isActive = true;
         keyFrame = 0;
         onStart();
-    }
+    }   
 
     protected final void processSequence() {
         if(!isActive) {

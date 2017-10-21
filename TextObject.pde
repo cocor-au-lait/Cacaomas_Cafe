@@ -20,6 +20,9 @@ private class TextObject extends GameObject {
         try {
             object = (TextObject)super.clone();
             object.states = new HashMap<String, State>(this.states);
+            for(Entry<String, State> entry : object.states.entrySet()) {
+                object.addState(entry.getKey(), entry.getValue());
+            }
            // object.subStates = new ArrayList<State>(this.subStates);
         } catch (Exception e){
             e.printStackTrace();

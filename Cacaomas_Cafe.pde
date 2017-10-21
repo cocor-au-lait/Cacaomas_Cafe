@@ -41,10 +41,10 @@ private enum ParameterType {ALPHA, SCALE, POSITION, SIZE, ROTATION}
 
 private boolean hasLoadedMainScene, hasLoadedBackgroundScene;
 
-private ArrayList<PlayerData> playerDate = new ArrayList<PlayerData>();
+private List<PlayerData> playerDate = new ArrayList<PlayerData>();
 
 public void setup() {
-    // MacBook Pro 13インチのデフォルトより1段階低い解像aa度
+    // MacBook Pro 13インチのデフォルトより1段階低い解像度
     // GPUパワーを使うためP2Dレンダーを使用
     // !!!FX2Dレンダーはフォントが設定できなくなるので断念
     size(1280, 800, P2D);
@@ -100,6 +100,12 @@ public void draw() {
     bgScene.drawScene();
     mainScene.drawScene();
     subScene.drawScene();
+    fill(0);
+    rectMode(CORNER);
+    rect(0, 0, WIDTH_MARGIN, height);
+    rect(0, 0, width, HEIGHT_MARGIN);
+    rect(width - WIDTH_MARGIN, 0, WIDTH_MARGIN, height);
+    rect(0, height - HEIGHT_MARGIN, width, HEIGHT_MARGIN);
 }
 
 void movieEvent(Movie m) {

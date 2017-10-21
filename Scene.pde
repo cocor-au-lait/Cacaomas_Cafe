@@ -1,11 +1,12 @@
 private abstract class Scene implements Runnable {
     protected boolean controllable;         // 操作の受け付けの制御
+    private boolean hasCached;
     private Thread thread;                // リソースの初期化を裏で行うスレッド
     private boolean isActive;
     private int sceneFrame;
     protected int sceneTime;
     protected List<GameObject> objects = new ArrayList<GameObject>();
-    protected HashMap<String, Sequence> sequences = new HashMap<String, Sequence>();
+    protected Map<String, Sequence> sequences = new HashMap<String, Sequence>();
 
     private Scene() {
         // リソースの初期化を裏で開始する
@@ -32,16 +33,52 @@ private abstract class Scene implements Runnable {
         isActive = false;
     }
 
+    protected final void startScene() {
+        startScene("enterSQ");
+    }
+
     protected final void startScene(String ... sequenceNames) {
         for(String sequenceName : sequenceNames) {
-            sequences.get(sequenceName).startSequence();
+            Sequence sequence = sequences.get(sequenceName);
+            if(sequence == null) {
+                println("Error:No such sequence");
+                exit();
+            }
+            sequence.startSequence();
         }
         isActive = true;
     }
 
-    private final void processScene() {
+    protected void enableObjects(GameObject ... objects) {
+        for(GameObject object : objects) {
+            object.enable();
+        }
+    }
+
+    protected void enableObjects() {
+        for(GameObject object : objects) {
+            object.enable();
+        }
+    }
+
+    protected void disableObjects(GameObject ... objects) {
+        for(GameObject object : objects) {
+            object.disable();
+        }
+    }
+
+    protected void disableObjects() {
+        for(GameObject object : objects) {
+            object.disable();
+        }
+    }
+
+    protected final void processScene() {
         if(!isActive) {
             return;
+        }
+        if(!hasCached) {
+            cacheObjects();
         }
         // 各シーンの全オブジェクトに付与されているステートの更新を行う
         for(GameObject object : objects) {
@@ -51,6 +88,18 @@ private abstract class Scene implements Runnable {
             entry.getValue().processSequence();
         }
         sceneTime = toTime(++sceneFrame);
+    }
+
+    private final void cacheObjects() {
+        for(GameObject object : objects) {
+            float tempAlpha = object.getAlpha();
+            object.enable();
+            object.setAlpha(0.0f);
+            object.drawObject();
+            object.setAlpha(tempAlpha);
+            object.disable();
+            hasCached = true;
+        }
     }
 
     private final void drawScene() {

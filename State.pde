@@ -81,14 +81,11 @@ private abstract class State implements Cloneable {
 
     protected final State setObject(GameObject object) {
         this.object = object;
-        onSetObject();
         return this;
     }
     /**
      * サブクラスにて詳細を記述
      */
-    // TweenState用
-    protected void onSetObject() {}
     // Stateに遷移した時に実行するメソッド
     protected void onEnter() {}
     // Stateに留まっている時に実行するメソッド
@@ -101,10 +98,11 @@ private class TweenState extends State {
     private ParameterType type;
     private float[] firstParam = new float[2];
     private float[] lastParam = new float[2];
+    private float[] addParam = new float[2];
     private float[] paramRange = new float[2];
     private int duration, loopInterval;
     private Easing easing = new EasingLinear();
-    private boolean freakyParam;
+    private boolean freakyParam, additionalParam;
 
     // ディープコピーを可能とするためにオーバーライド
     @Override
@@ -112,6 +110,10 @@ private class TweenState extends State {
         TweenState state = new TweenState();
         try {
            state = (TweenState)super.clone();
+           state.firstParam = Arrays.copyOf(this.firstParam, this.firstParam.length);
+           state.lastParam = Arrays.copyOf(this.lastParam, this.lastParam.length);
+           state.addParam = Arrays.copyOf(this.addParam, this.addParam.length);
+           state.paramRange = Arrays.copyOf(this.paramRange, this.paramRange.length);
            //state.object = this.object.clone();
            // ???enumはcloneが必要？
         } catch (Exception e){
@@ -160,6 +162,23 @@ private class TweenState extends State {
         return this;
     }
 
+    private TweenState setAdditionalTween(float addParam, int duration) {
+        this.addParam[0] = addParam;
+        this.duration = duration;
+        freakyParam = true;
+        additionalParam = true;
+        return this;
+    }
+
+    private TweenState setAdditionalTween(float addParamX, float addParamY, int duration) {
+        this.addParam[0] = addParamX;
+        this.addParam[1] = addParamY;
+        this.duration = duration;
+        freakyParam = true;
+        additionalParam = true;
+        return this;
+    }
+
     private TweenState setEasing(Easing easing) {
         this.easing = easing;
         return this;
@@ -173,17 +192,12 @@ private class TweenState extends State {
     }
 
     @Override
-    protected void onSetObject() {
+    protected void onEnter() {
         if(!freakyParam) {
             setParameter(0.0f);
+            return;
         }
-    }
-
-    @Override
-    protected void onEnter() {
-        if(freakyParam) {
-            getParameter();
-        }
+        getParameter();
     }
 
     @Override
@@ -219,6 +233,10 @@ private class TweenState extends State {
         case ROTATION:
             firstParam[0] = object.getRotation();
             break;
+        }
+        if(additionalParam) {
+            lastParam[0] = firstParam[0] + addParam[0];
+            lastParam[1] = firstParam[1] + addParam[1];
         }
         paramRange[0] = lastParam[0] - firstParam[0];
         paramRange[1] = lastParam[1] - firstParam[1];
