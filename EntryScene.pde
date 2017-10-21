@@ -20,10 +20,18 @@ private class EntryScene extends Scene {
             .setEasing(new EasingInQuint()));
 
         final FigureObject opBG = new FigureObject();
+        opBG.setCornerNum(0);
+        opBG.setMode(CENTER);
         opBG.setColor(color(#FFF7DE));
-        opBG.setSize(BASE_WIDTH, BASE_HEIGHT);
+        opBG.setPosition(BASE_WIDTH / 2, BASE_HEIGHT / 2);
+        opBG.setSize(BASE_WIDTH * 2, BASE_WIDTH * 2);
         opBG.addState("fadeOut", new TweenState(ParameterType.ALPHA)
             .setFreakyTween(0.0f, 300));
+        opBG.addState("fadeIn", new TweenState(ParameterType.ALPHA)
+            .setFreakyTween(1.0f, 300));
+        opBG.addState("zoomIn", new TweenState(ParameterType.SCALE)
+            .setTween(0.0f, 1.0f, 600)
+            .setEasing(new EasingInQuint()));
 
         // プレーヤーデータ
         final ArrayList<PlayerData> playerData = new ArrayList<PlayerData>();
@@ -44,7 +52,6 @@ private class EntryScene extends Scene {
         pd.setRank(db.getInt("rank"));
         db.close();
 
-        // プレーヤーデータ用オブジェクト
         final TextObject titleText = new TextObject("Enrty");
         titleText.setFont(bickham);
         titleText.setTextSize(141);
@@ -119,12 +126,21 @@ private class EntryScene extends Scene {
         playerIcon.setPosition(301, 445);
         playerIcon.addState("fade", new TweenState(ParameterType.ALPHA)
             .setTween(0.0f, 1.0f, 200));
-
-        final GroupObject cards = new GroupObject(cardImage, information,
+        // カードの画像、各文字をグルーピング
+        final GroupObject card = new GroupObject(cardImage, information,
             itemTexts[0], itemTexts[1], itemTexts[2],
             itemTextsLine[0], itemTextsLine[1], itemTextsLine[2]);
-        cards.addState("fade", new TweenState(ParameterType.ALPHA)
-            .setTween(0.0f, 1.0f, 400));
+        card.addPosition(-1200, 0);
+        card.addState("slideIn", new TweenState(ParameterType.POSITION)
+            .setAdditionalTween(1200, 0, 900)
+            .setEasing(new EasingOutQuint()));
+        // カードに記載された情報を全てグルーピング
+        final GroupObject playerCard = new GroupObject(playerIcon, playerName,
+            playerRank, playerPoint);
+        playerCard.jointGroup(card);
+        playerCard.addState("slideOut", new TweenState(ParameterType.POSITION)
+            .setAdditionalTween(1200, 0, 900)
+            .setEasing(new EasingOutQuint()));
 
 
         // 説明用オブジェクト
@@ -149,32 +165,12 @@ private class EntryScene extends Scene {
                 switch(keyTime) {
                 case 0:
                     bgScene.startScene("idleSQ");
-                    enableObjects(opBG, titleText, titleTextLine);
+                    enableObjects(titleText, titleTextLine);
                     break;
-                case 500:
-                    opTitle.startState("fadeIn", "zoomIn");
+                case 600:
+                    card.startState("slideIn");
                     break;
-                case 2000:
-                    opTitle.startState("fadeOut", "zoomOut");
-                    break;
-                case 2500:
-                    opBG.startState("fadeOut");
-                    break;
-                case 2800:
-                    changeSequence(sequences.get("cardsSQ"));
-                    break;
-                }
-            }
-        });
-
-        sequences.put("cardsSQ", new Sequence() {
-            @Override
-            protected void onProcess() {
-                switch(keyTime) {
-                case 0:
-                    cards.startState("fade");
-                    break;
-                case 500:
+                case 1500:
                     changeSequence(sequences.get("playerSQ"));
                     break;
                 }
@@ -199,6 +195,7 @@ private class EntryScene extends Scene {
                     break;
                 case 600:
                     changeSequence(sequences.get("idleSQ"));
+                    break;
                 }
             }
         });
@@ -207,16 +204,32 @@ private class EntryScene extends Scene {
             @Override
             protected void onStart() {
                 hint.startState("fade");
+                subScene = new SimpleTransition("Mode Select");
             }
             @Override
             protected void onProcess() {
+                if(inputListener.onPressed(6)) {
+                    changeSequence(sequences.get("cardExitSQ"));
+                }
+            }
+        });
 
+        sequences.put("cardExitSQ", new Sequence() {
+            @Override
+            protected void onProcess() {
+                switch(keyTime) {
+                case 0:
+                    playerCard.startState("slideOut");
+                    break;
+                case 600:
+                    subScene.startScene();
+                }
             }
         });
     }
 
     @Override
     protected Scene disposeScene() {
-        return this;
+        return new ModeSelectScene();
     }
 }

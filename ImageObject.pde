@@ -20,6 +20,9 @@ private class ImageObject extends GameObject {
         try {
             object = (ImageObject)super.clone();
             object.states = new HashMap<String, State>(this.states);
+            for(Entry<String, State> entry : object.states.entrySet()) {
+                object.addState(entry.getKey(), entry.getValue());
+            }
             //object.subStates = new ArrayList<State>(this.subStates);
         } catch (Exception e){
             e.printStackTrace();
@@ -75,7 +78,7 @@ private class ImageObject extends GameObject {
         pushMatrix();
         translate(posRX, posRY);
         rotate(radians(rotation));
-        popMatrix();
+        translate(-posRX, -posRY);
         tint(colors, alpha);
         imageMode(mode);
 
@@ -106,6 +109,7 @@ private class ImageObject extends GameObject {
             break;
         };
 
+        popMatrix();
         noTint();
     }
 }

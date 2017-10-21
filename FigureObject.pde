@@ -17,6 +17,10 @@ private class FigureObject extends GameObject {
         try {
             object = (FigureObject)super.clone();
             object.states = new HashMap<String, State>(this.states);
+            for(Entry<String, State> entry : object.states.entrySet()) {
+                object.addState(entry.getKey(), entry.getValue());
+            }
+            //object.colors = new Integer(this.colors);
             //object.subStates = new ArrayList<State>(this.subStates);
         } catch (Exception e){
             e.printStackTrace();
@@ -134,6 +138,7 @@ private class FigureObject extends GameObject {
         }
 
         rectMode(mode);
+        ellipseMode(mode);
 
         float diffX = (sizeX * (scale - 1.0f)) / 2.0f;
         float diffY = (sizeY * (scale - 1.0f)) / 2.0f;

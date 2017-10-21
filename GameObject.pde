@@ -6,7 +6,7 @@ private abstract class GameObject implements Cloneable {
     protected float alpha = 1.0f;
     private int blend = BLEND;
     protected color colors;
-    protected HashMap<String, State> states = new HashMap<String, State>();
+    protected Map<String, State> states = new HashMap<String, State>();
     //protected ArrayList<State> subStates = new ArrayList<State>();
 
     /*@Override
@@ -220,11 +220,50 @@ private abstract class GameObject implements Cloneable {
     protected abstract void adjustParameter();
 }
 
-private class GroupObject {
-    GameObject[] objects;
+private class GroupObject implements Cloneable {
+    ArrayList<GameObject> objects;
 
     private GroupObject(GameObject ... objects) {
-        this.objects = objects;
+        this.objects = new ArrayList<GameObject>(Arrays.asList(objects));
+    }
+
+    @Override
+    public GroupObject clone(){
+        GroupObject group = new GroupObject();
+        try {
+            group = (GroupObject)super.clone();
+            group.objects = new ArrayList<GameObject>(this.objects);
+            for(GameObject object : group.objects) {
+                for(Entry<String, State> entry : object.states.entrySet()) {
+                    object.addState(entry.getKey(), entry.getValue());
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return group;
+    }
+
+    private ArrayList<GameObject> getObjects() {
+        return objects;
+    }
+
+    private void jointGroup(GroupObject ... groups) {
+        for(GroupObject group : groups) {
+            this.addObjects(group.getObjects());
+        }
+    }
+
+    private void addObjects(GameObject ... objects) {
+        for(GameObject object : objects) {
+            this.objects.add(object);
+        }
+    }
+
+    private void addObjects(ArrayList<GameObject> objects) {
+        for(GameObject object : objects) {
+            this.objects.add(object);
+        }
     }
 
     private void enable() {

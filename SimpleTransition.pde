@@ -1,37 +1,11 @@
-private class DefaultTransition extends Scene {
+private class SimpleTransition extends Scene {
     private String textString;
 
-    private DefaultTransition(String textString) {
+    private SimpleTransition(String textString) {
         this.textString = textString;
     }
 
-
     public void run() {
-        //final SoundFile se = new SoundFile(applet, "sound/se/drip.wav");
-
-        final FigureObject dripLiquid = new FigureObject();
-        dripLiquid.setColor(color(#553D2A));
-        dripLiquid.setMode(CORNERS);
-        dripLiquid.setPosition2(BASE_WIDTH, BASE_HEIGHT);
-        dripLiquid.addState("enter", new TweenState(ParameterType.POSITION)
-            .setTween(0, BASE_HEIGHT, 0, 0, 1300)
-            .setEasing(new EasingInCirc()));
-        dripLiquid.addState("exit", new TweenState(ParameterType.POSITION)
-            .setFreakyTween(0, BASE_HEIGHT, 800)
-            .setEasing(new EasingOutExpo()));
-
-        final ImageObject logo = new ImageObject("image/parts/white_logo.png");
-        logo.setMode(CORNER);
-        logo.setPosition(880, 660);
-        logo.setSize(362, 110);
-        logo.addState("fadeInA", new TweenState(ParameterType.ALPHA)
-            .setTween(0.0f, 1.0f, 400));
-        logo.addState("fadeInS", new TweenState(ParameterType.SCALE)
-            .setTween(2.0f, 1.0f, 400)
-            .setEasing(new EasingOutExpo()));
-        logo.addState("fadeOutA", new TweenState(ParameterType.ALPHA)
-            .setFreakyTween(0.0f, 200));
-
         final TextObject mainText = new TextObject(textString);
         mainText.setFont(bickham);
         mainText.setAlign(CENTER, CENTER);
@@ -58,24 +32,38 @@ private class DefaultTransition extends Scene {
         background.setSize(BASE_WIDTH * 2, BASE_WIDTH * 2);
         background.addState("fadeOut", new TweenState(ParameterType.ALPHA)
             .setFreakyTween(0.0f, 300));
+        background.addState("fadeIn", new TweenState(ParameterType.ALPHA)
+            .setFreakyTween(1.0f, 300));
+        background.addState("zoomIn", new TweenState(ParameterType.SCALE)
+            .setTween(0.0f, 1.0f, 600)
+            .setEasing(new EasingInQuint()));
 
+        final FigureObject background2 = background.clone();
+        background2.setColor(color(#553D2A));
 
-        objects = Arrays.asList(background, mainText, dripLiquid, logo);
+        final FigureObject background3 = background.clone();
+
+        objects = Arrays.asList(background, background2, background3, mainText);
 
         sequences.put("enterSQ", new Sequence() {
             @Override
             protected void onProcess() {
                 switch(keyTime) {
                 case 0:
-                    dripLiquid.startState("enter");
-                    //se.play();
+                    background.startState("fadeIn", "zoomIn");
                     break;
-                case 1300:
+                case 300:
+                    background2.startState("fadeIn", "zoomIn");
+                    break;
+                case 500:
+                    background3.startState("fadeIn", "zoomIn");
+                    break;
+                case 1100:
+                    disableObjects(background, background2);
+                    mainText.startState("fadeIn", "zoomIn");
+                    break;
+                case 1600:
                     mainScene = mainScene.disposeScene();
-                    break;
-                case 1500:
-                    logo.startState("fadeInA");
-                    logo.startState("fadeInS");
                     changeSequence(sequences.get("idleSQ"));
                     break;
                 }
@@ -85,7 +73,7 @@ private class DefaultTransition extends Scene {
         sequences.put("idleSQ", new Sequence() {
             @Override
             protected void onProcess() {
-                if(keyTime > 3000 && mainScene.hasLoaded()) {
+                if(keyTime > 1000 && mainScene.hasLoaded()) {
                     changeSequence(sequences.get("exitSQ"));
                 }
             }
@@ -96,23 +84,13 @@ private class DefaultTransition extends Scene {
             protected void onProcess() {
                 switch(keyTime) {
                 case 0:
-                    logo.startState("fadeOutA");
-                    break;
-                case 300:
-                    background.enable();
-                    dripLiquid.startState("exit");
-                    break;
-                case 1000:
-                    mainText.startState("fadeIn", "zoomIn");
-                    break;
-                case 2500:
                     mainScene.startScene();
                     mainText.startState("fadeOut", "zoomOut");
                     break;
-                case 3000:
-                    background.startState("fadeOut");
+                case 500:
+                    background3.startState("fadeOut");
                     break;
-                case 3300:
+                case 800:
                     disposeScene();
                     break;
                 }

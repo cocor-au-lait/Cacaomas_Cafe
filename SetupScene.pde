@@ -3,7 +3,6 @@ private class SetupScene extends Scene {
         // オブジェクトの生成（順不同）
         final FigureObject background = new FigureObject();
         background.setSize(BASE_WIDTH, BASE_HEIGHT);
-        background.enable();
 
         final TextObject creditTitle = new TextObject("Project\nCacaomas_Cafe");
         creditTitle.setPosition(BASE_WIDTH / 2, 250);
@@ -39,7 +38,7 @@ private class SetupScene extends Scene {
                 // ！！！注意：50ms以上で判定を行うこと
                 switch(keyTime) {
                 case 0:
-                    credit.enable();
+                    background.enable();
                     break;
                 case 1500/*ms*/:
                     credit.startState("fade");
