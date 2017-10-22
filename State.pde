@@ -23,11 +23,11 @@ private abstract class State implements Cloneable {
         return state;
     }
     // Stateを開始するメソッド
-    protected final State enter() {
+    protected final void enter() {
         stateFrame = 0;
+        stateTime = 0;
         isActive = true;
         onEnter();
-        return this;
     }
     protected final void exit() {
         isActive = false;

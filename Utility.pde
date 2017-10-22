@@ -24,6 +24,20 @@ private float getAntiRatio(float elapsion, int duration, Easing easing) {
     return ratio;
 }
 
+private GroupObject getFrameGroup(String titleText) {
+    TextObject title = new TextObject();
+    title.setText(titleText);
+    title.setFont(bickham);
+    title.setTextSize(141);
+    title.setAlign(CENTER, TOP);
+    title.setPosition(BASE_WIDTH / 2, 0);
+    FigureObject line = new FigureObject();
+    line.setPosition(80, 120);
+    line.setSize(1120, 3);
+    GroupObject group = new GroupObject(title, line);
+    return group;
+}
+
 /*
 private class FrameCounter {
     private int elapsedFrame;

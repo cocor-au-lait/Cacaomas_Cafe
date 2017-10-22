@@ -15,8 +15,8 @@ private class SimpleTransition extends Scene {
             .setTween(0.0f, 1.0f, 300)
             .setEasing(new EasingOutQuint()));
         mainText.addState("zoomIn", new TweenState(ParameterType.SCALE)
-            .setTween(0.3f, 1.0f, 500)
-            .setEasing(new EasingOutBack()));
+            .setTween(0.3f, 1.0f, 600)
+            .setEasing(new EasingOutQuint()));
         mainText.addState("fadeOut", new TweenState(ParameterType.ALPHA)
             .setFreakyTween(0.0f, 300)
             .setEasing(new EasingInQuint()));
@@ -32,10 +32,8 @@ private class SimpleTransition extends Scene {
         background.setSize(BASE_WIDTH * 2, BASE_WIDTH * 2);
         background.addState("fadeOut", new TweenState(ParameterType.ALPHA)
             .setFreakyTween(0.0f, 300));
-        background.addState("fadeIn", new TweenState(ParameterType.ALPHA)
-            .setFreakyTween(1.0f, 300));
         background.addState("zoomIn", new TweenState(ParameterType.SCALE)
-            .setTween(0.0f, 1.0f, 600)
+            .setTween(0.0f, 1.0f, 500)
             .setEasing(new EasingInQuint()));
 
         final FigureObject background2 = background.clone();
@@ -50,19 +48,19 @@ private class SimpleTransition extends Scene {
             protected void onProcess() {
                 switch(keyTime) {
                 case 0:
-                    background.startState("fadeIn", "zoomIn");
+                    background.startState("zoomIn");
+                    break;
+                case 200:
+                    background2.startState("zoomIn");
                     break;
                 case 300:
-                    background2.startState("fadeIn", "zoomIn");
+                    background3.startState("zoomIn");
                     break;
-                case 500:
-                    background3.startState("fadeIn", "zoomIn");
-                    break;
-                case 1100:
-                    disableObjects(background, background2);
+                case 900:
+                    disableObjects(background2, background3);
                     mainText.startState("fadeIn", "zoomIn");
                     break;
-                case 1600:
+                case 1400:
                     mainScene = mainScene.disposeScene();
                     changeSequence(sequences.get("idleSQ"));
                     break;
@@ -84,13 +82,17 @@ private class SimpleTransition extends Scene {
             protected void onProcess() {
                 switch(keyTime) {
                 case 0:
-                    mainScene.startScene();
                     mainText.startState("fadeOut", "zoomOut");
                     break;
-                case 500:
-                    background3.startState("fadeOut");
+                case 100:
+                    background2.startState("zoomIn");
                     break;
                 case 800:
+                    mainScene.startScene();
+                    background.disableObject();
+                    background2.startState("fadeOut");
+                    break;
+                case 1300:
                     disposeScene();
                     break;
                 }

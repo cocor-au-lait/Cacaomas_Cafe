@@ -38,7 +38,7 @@ private class SetupScene extends Scene {
                 // ！！！注意：50ms以上で判定を行うこと
                 switch(keyTime) {
                 case 0:
-                    background.enable();
+                    background.enableObject();
                     break;
                 case 1500/*ms*/:
                     credit.startState("fade");
@@ -70,6 +70,7 @@ private class SetupScene extends Scene {
         athelas = createFont("Athelas", 100, true);
         baoli = createFont("Baoli SC", 100, true);
         yuGothic = createFont("YuGothic", 100, true);
+        yuMincho = createFont("YuMincho", 100, true);
     }
     // シーンを抜ける時の処理
     @Override

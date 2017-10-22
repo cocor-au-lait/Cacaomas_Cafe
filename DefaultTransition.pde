@@ -99,7 +99,7 @@ private class DefaultTransition extends Scene {
                     logo.startState("fadeOutA");
                     break;
                 case 300:
-                    background.enable();
+                    background.enableObject();
                     dripLiquid.startState("exit");
                     break;
                 case 1000:

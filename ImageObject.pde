@@ -76,9 +76,11 @@ private class ImageObject extends GameObject {
     @Override
     protected void concreteDraw() {
         pushMatrix();
-        translate(posRX, posRY);
+        float realPosRX = posRX * DISPLAY_SCALE + WIDTH_MARGIN;
+        float realPosRY = posRY * DISPLAY_SCALE + HEIGHT_MARGIN;
+        translate(realPosRX, realPosRY);
         rotate(radians(rotation));
-        translate(-posRX, -posRY);
+        translate(-realPosRX, -realPosRY);
         tint(colors, alpha);
         imageMode(mode);
 
