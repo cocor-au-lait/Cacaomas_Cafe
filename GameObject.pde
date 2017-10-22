@@ -6,6 +6,7 @@ private abstract class GameObject implements Cloneable {
     protected float alpha = 1.0f;
     private int blend = BLEND;
     protected color colors;
+    protected float colorH, colorS, colorB;
     protected Map<String, State> states = new HashMap<String, State>();
     //protected ArrayList<State> subStates = new ArrayList<State>();
 
@@ -18,6 +19,9 @@ private abstract class GameObject implements Cloneable {
         try {
             object = (GameObject)super.clone();
             object.states = new HashMap<String, State>(this.states);
+            for(Entry<String, State> entry : object.states.entrySet()) {
+                object.addState(entry.getKey(), entry.getValue());
+            }
            // object.subStates = new ArrayList<State>(this.subStates);
         } catch (Exception e){
             e.printStackTrace();
@@ -124,8 +128,36 @@ private abstract class GameObject implements Cloneable {
         this.colors = colors;
     }
 
+    protected final void setColor(float colorB) {
+        setColor(0.0f, 0.0f , colorB);
+    }
+
+    protected final void setColor(float colorH, float colorS, float colorB) {
+        float[] colorHSB = {colorH, colorS, colorB};
+        for(float c : colorHSB) {
+            if(c > 100.0f) {
+                c = 100.0f;
+            } else if(c < 0.0f) {
+                c = 100.0f;
+            }
+        }
+        this.colorH = colorHSB[0];
+        this.colorS = colorHSB[1];
+        this.colorB = colorHSB[2];
+        setColor(color(colorHSB[0], colorHSB[1], colorHSB[2]));
+    }
+
     protected final color getColor() {
         return colors;
+    }
+
+    protected final float getColorB() {
+        return colorB;
+    }
+
+    protected final float[] getColorHSB() {
+        float[] colorHSB = {colorH, colorS, colorB};
+        return colorHSB;
     }
 
     protected final void setAlpha(float alpha) {
@@ -173,6 +205,16 @@ private abstract class GameObject implements Cloneable {
                 return;
             }
             states.get(name).enter();
+        }
+    }
+
+    protected final void stopState(String ... names) {
+        for(String name : names) {
+            if(states.get(name) == null) {
+                println("Error:No such state");
+                return;
+            }
+            states.get(name).exitState();
         }
     }
 
@@ -291,6 +333,22 @@ private class GroupObject implements Cloneable {
         }
     }
 
+    protected final void setColor(float colorB) {
+        for(GameObject object : objects) {
+            object.colorB = colorB;
+            object.setColor(color(0.0f, 0.0f , colorB));
+        }
+    }
+
+    protected final void setColor(float colorH, float colorS, float colorB) {
+        for(GameObject object : objects) {
+            object.colorH = colorH;
+            object.colorS = colorS;
+            object.colorB = colorB;
+            object.setColor(color(colorH, colorS, colorB));
+        }
+    }
+
     private void setAlpha(float alpha) {
         for(GameObject object : objects) {
             object.setAlpha(alpha);
@@ -342,6 +400,12 @@ private class GroupObject implements Cloneable {
     protected final void startState(String ... names) {
         for(GameObject object : objects) {
             object.startState(names);
+        }
+    }
+
+    protected final void stopState(String ... names) {
+        for(GameObject object : objects) {
+            object.stopState(names);
         }
     }
 }

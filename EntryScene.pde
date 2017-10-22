@@ -171,7 +171,7 @@ private class EntryScene extends Scene {
             }
             @Override
             protected void onProcess() {
-                if(inputListener.onPressed(6)) {
+                if(keyListener.isPressed(6)) {
                     changeSequence(sequences.get("cardExitSQ"));
                 }
             }

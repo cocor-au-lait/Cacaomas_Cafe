@@ -6,7 +6,7 @@ private class ImageObject extends GameObject {
     private float wipePosX, wipePosY, wipeSizeX, wipeSizeY;
 
     private ImageObject() {
-        colors = color(255);
+        setColor(100.0f);
     }
 
     private ImageObject(String filename) {
@@ -42,6 +42,10 @@ private class ImageObject extends GameObject {
         wipeSizeX = image.width;
         wipeSizeY = image.height;
         adjustParameter();
+    }
+
+    private void changeImage(String filename) {
+        image = loadImage(filename);
     }
 
     private void setWipe(float wipePosX, float wipePosY, float wipeSizeX, float wipeSizeY) {

@@ -38,6 +38,7 @@ private abstract class Scene implements Runnable {
     }
 
     protected final void startScene(String ... sequenceNames) {
+        cacheObjects();
         for(String sequenceName : sequenceNames) {
             Sequence sequence = sequences.get(sequenceName);
             if(sequence == null) {
@@ -85,9 +86,6 @@ private abstract class Scene implements Runnable {
         if(!isActive) {
             return;
         }
-        if(!hasCached) {
-            cacheObjects();
-        }
         // 各シーンの全オブジェクトに付与されているステートの更新を行う
         for(GameObject object : objects) {
             object.updateState();
@@ -98,7 +96,7 @@ private abstract class Scene implements Runnable {
         sceneTime = toTime(++sceneFrame);
     }
 
-    private final void cacheObjects() {
+    protected void cacheObjects() {
         for(GameObject object : objects) {
             float tempAlpha = object.getAlpha();
             object.enableObject();

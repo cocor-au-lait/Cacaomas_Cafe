@@ -7,7 +7,7 @@ private abstract class Sequence {
         isActive = true;
         keyFrame = 0;
         onStart();
-    }   
+    }
 
     protected final void processSequence() {
         if(!isActive) {
@@ -17,7 +17,7 @@ private abstract class Sequence {
         keyTime = toTime(++keyFrame);
     }
 
-    protected final void replaySequence() {
+    protected final void resetSequence() {
         keyFrame = 0;
     }
 

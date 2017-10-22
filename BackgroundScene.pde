@@ -9,7 +9,7 @@ private class BackgroundScene extends Scene {
         final FigureObject rotater[] = new FigureObject[6];
         rotater[0] = new FigureObject();
         rotater[0].setMode(CENTER);
-        rotater[0].setColor(15);
+        rotater[0].setColor(5.0f);
         rotater[0].setBlend(ADD);
         rotater[0].setPosition(154  , 473);
         rotater[0].setSize(200, 200);

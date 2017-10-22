@@ -41,8 +41,8 @@ private class DefaultTransition extends Scene {
             .setTween(0.0f, 1.0f, 300)
             .setEasing(new EasingOutQuint()));
         mainText.addState("zoomIn", new TweenState(ParameterType.SCALE)
-            .setTween(0.3f, 1.0f, 500)
-            .setEasing(new EasingOutBack()));
+            .setTween(0.3f, 1.0f, 600)
+            .setEasing(new EasingOutQuint()));
         mainText.addState("fadeOut", new TweenState(ParameterType.ALPHA)
             .setFreakyTween(0.0f, 300)
             .setEasing(new EasingInQuint()));
@@ -58,9 +58,17 @@ private class DefaultTransition extends Scene {
         background.setSize(BASE_WIDTH * 2, BASE_WIDTH * 2);
         background.addState("fadeOut", new TweenState(ParameterType.ALPHA)
             .setFreakyTween(0.0f, 300));
+        background.addState("zoomIn", new TweenState(ParameterType.SCALE)
+            .setTween(0.0f, 1.0f, 500)
+            .setEasing(new EasingInQuint()));
+
+        final FigureObject background2 = background.clone();
+        background2.setColor(color(#553D2A));
+
+        final FigureObject background3 = background.clone();
 
 
-        objects = Arrays.asList(background, mainText, dripLiquid, logo);
+        objects = Arrays.asList(background, background2, background3, mainText, dripLiquid, logo);
 
         sequences.put("enterSQ", new Sequence() {
             @Override
@@ -102,17 +110,21 @@ private class DefaultTransition extends Scene {
                     background.enableObject();
                     dripLiquid.startState("exit");
                     break;
-                case 1000:
+                case 700:
                     mainText.startState("fadeIn", "zoomIn");
                     break;
-                case 2500:
-                    mainScene.startScene();
+                case 2200:
                     mainText.startState("fadeOut", "zoomOut");
                     break;
-                case 3000:
-                    background.startState("fadeOut");
+                case 2300:
+                    background2.startState("zoomIn");
                     break;
-                case 3300:
+                case 3000:
+                    mainScene.startScene();
+                    background.disableObject();
+                    background2.startState("fadeOut");
+                    break;
+                case 3500:
                     disposeScene();
                     break;
                 }

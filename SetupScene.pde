@@ -8,7 +8,7 @@ private class SetupScene extends Scene {
         creditTitle.setPosition(BASE_WIDTH / 2, 250);
         creditTitle.setTextSize(70);
         creditTitle.setFont(font0);
-        creditTitle.setColor(color(255));
+        creditTitle.setColor(color(100.0f));
         creditTitle.setAlign(CENTER, TOP);
 
         final TextObject creditDetail = creditTitle.clone();
@@ -54,11 +54,11 @@ private class SetupScene extends Scene {
     }
     // バックグラウンド処理はこちら側に書く
     public void run() {
-        inputListener = new InputListner();
+        keyListener = new InputListner();
         minim = new Minim(applet);
         mainScene = new TitleScene();
         hasLoadedMainScene = true;
-        inputListener.start();
+        keyListener.start();
         //bms = new BmsController();
 
         //////////////////////////////////////////////////////
