@@ -6,7 +6,7 @@ private class ImageObject extends GameObject {
     private float wipePosX, wipePosY, wipeSizeX, wipeSizeY;
 
     private ImageObject() {
-        colors = color(255);
+        setColor(100.0f);
     }
 
     private ImageObject(String filename) {
@@ -44,6 +44,10 @@ private class ImageObject extends GameObject {
         adjustParameter();
     }
 
+    private void changeImage(String filename) {
+        image = loadImage(filename);
+    }
+
     private void setWipe(float wipePosX, float wipePosY, float wipeSizeX, float wipeSizeY) {
         this.wipePosX = wipePosX;
         this.wipePosY = wipePosY;
@@ -76,9 +80,11 @@ private class ImageObject extends GameObject {
     @Override
     protected void concreteDraw() {
         pushMatrix();
-        translate(posRX, posRY);
+        float realPosRX = posRX * DISPLAY_SCALE + WIDTH_MARGIN;
+        float realPosRY = posRY * DISPLAY_SCALE + HEIGHT_MARGIN;
+        translate(realPosRX, realPosRY);
         rotate(radians(rotation));
-        translate(-posRX, -posRY);
+        translate(-realPosRX, -realPosRY);
         tint(colors, alpha);
         imageMode(mode);
 

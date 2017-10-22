@@ -1,4 +1,4 @@
-public class InputListner extends Thread {
+private class InputListner extends Thread {
     // ゲームパッド用パーツ用意
     ControlIO control;
     private ControlDevice device;
@@ -7,11 +7,11 @@ public class InputListner extends Thread {
     // キー制御
     private boolean[] onKey;
     private boolean[] press;
-    private int scratch_status;
+    private int scratchStatus;
     // 初期化をThreadで行わせることで描画の開始を早くする
     public void run() {
         keyStatus = new ArrayList<Boolean>();
-        for(int i = 0; i < 8; i++) {
+        for(int i = 0; i < 12; i++) {
             keyStatus.add(false);
         }
         onKey = new boolean[8];
@@ -32,11 +32,18 @@ public class InputListner extends Thread {
         }
     }
 
-    public boolean onPressed(int num) {
+    private boolean isPressed(int num) {
+        if(overFrame > 0) {
+            return false;
+        }
         return press[num];
     }
 
-    public void manageInput() {
+    private boolean isScratchStatus(int scratchStatus) {
+        return this.scratchStatus == scratchStatus;
+    }
+
+    private void manageInput() {
         //キーの処理
         press = new boolean[8];
         // 白黒ボタン & その他キー
@@ -55,25 +62,27 @@ public class InputListner extends Thread {
         }
 
         // スクラッチの処理
-        if(keyStatus.get(5) || (scratch != null && scratch.getValue() == 1.0)) {
+        boolean keyStatusRight = keyStatus.get(5) || keyStatus.get(8) || keyStatus.get(11);
+        boolean keyStatusLeft = keyStatus.get(5) || keyStatus.get(9) || keyStatus.get(10);
+        if(keyStatusRight || (scratch != null && scratch.getValue() == 1.0)) {
             // 右回転
-            if(scratch_status != 1) {
+            if(scratchStatus != 1) {
                 // 以前が停止か左回りなら回した瞬間とする
                 press[5] = true;
-                scratch_status = 1;
+                scratchStatus = 1;
             }
         }
-        else if(keyStatus.get(5) || (scratch != null && scratch.getValue() == -1.0)) {
+        else if(keyStatusLeft || (scratch != null && scratch.getValue() == -1.0)) {
             // 左回転
-            if(scratch_status != -1) {
+            if(scratchStatus != -1) {
                 // 以前が停止か右回りなら回した瞬間とする
                 press[5] = true;
-                scratch_status = -1;
+                scratchStatus = -1;
             }
         }
         else {
             // 回転停止
-            scratch_status = 0;
+            scratchStatus = 0;
         }
     }
 }

@@ -15,16 +15,16 @@ import de.bezier.data.sql.*;        // データベース用
 // データベース管理
 private SQLite db;
 // ###加えて各ステートで使うフォントを読み込ませる
-private PFont font0, appleChancery, bickham, ayuthaya, athelas, baoli, yuGothic;
+private PFont font0, appleChancery, bickham, ayuthaya, athelas, baoli, yuGothic, yuMincho;
 // 音楽ファイルコア（画面遷移の際にも音が再生できるようにグローバル変数として設定）
 private Minim minim;
 // ポリモーフィズムを利用して各画面を構成
 private Scene mainScene, subScene, bgScene;
 // ボタン、キーボードの監視クラス
-private InputListner inputListener;
+private InputListner keyListener;
 private PApplet applet = this;
 // キーを覚える配列（同時押し用）
-private ArrayList<Boolean> keyStatus;
+private List<Boolean> keyStatus;
 private static float DISPLAY_SCALE, DISPLAY_MAX_SCALE, WIDTH_MARGIN, HEIGHT_MARGIN;
 
 private static final int FRAME_RATE = 60;
@@ -33,11 +33,12 @@ private static final int BASE_WIDTH = 1280;
 private static final int BASE_HEIGHT = 800;
 // フレーム単位の処理を補助するタイマー
 private FrameTimer frameTimer;
+private int overFrame;
 // デバッグ用平均FPS表示関数
 private FrameRate debugFramerate = new FrameRate(FRAME_RATE);
 private enum NumType {RELATIVE, ABSOLUTE}
 private enum LoopType {RESTART, YOYO, RETURN}
-private enum ParameterType {ALPHA, SCALE, POSITION, SIZE, ROTATION}
+private enum ParameterType {ALPHA, SCALE, POSITION, SIZE, ROTATION, COLOR}
 
 private boolean hasLoadedMainScene, hasLoadedBackgroundScene;
 
@@ -70,7 +71,7 @@ public void setup() {
     //noCursor();
     frameRate(FRAME_RATE);
     //smooth(4);
-    colorMode(HSB, 255.0f, 255.0f, 255.0f, 1.0f);
+    colorMode(HSB, 100.0f, 100.0f, 100.0f, 1.0f);
     font0 = createFont("PrestigeEliteStd-Bd", 70, true);
     frameTimer = new FrameTimer();
     bgScene = new BackgroundScene();
@@ -86,17 +87,16 @@ public void draw() {
     surface.setTitle(debugFramerate.fps + "fps");
     //////////////////////////////////////////////////////////////
     // 入力されたキーの処理を行う
-    inputListener.manageInput();
+    keyListener.manageInput();
     // 各画面の管理、描画
     int diffFrame = frameTimer.getDiffFrame();
+    overFrame = 0;
     for(int i = 0; i < diffFrame; i++) {
         bgScene.processScene();
         mainScene.processScene();
         subScene.processScene();
+        overFrame++;
     }
-    // 画面切り替えの際にオーバーレイする画面の管理、描画
-    // メイン画面切り替えの際のつなぎ目として動作する
-    // 普段は描画を行わない
     bgScene.drawScene();
     mainScene.drawScene();
     subScene.drawScene();
@@ -126,6 +126,18 @@ public void keyPressed() {
         break;
     case TAB:
         keyStatus.set(7, true);       //SELECT
+        break;
+    case RIGHT:
+        keyStatus.set(8, true);
+        break;
+    case LEFT:
+        keyStatus.set(9, true);
+        break;
+    case UP:
+        keyStatus.set(10, true);
+        break;
+    case DOWN:
+        keyStatus.set(11, true);
         break;
     }
 
@@ -164,6 +176,18 @@ public void keyReleased() {
         break;
     case TAB:
         keyStatus.set(7, false);          //SELECT
+        break;
+    case RIGHT:
+        keyStatus.set(8, false);
+        break;
+    case LEFT:
+        keyStatus.set(9, false);
+        break;
+    case UP:
+        keyStatus.set(10, false);
+        break;
+    case DOWN:
+        keyStatus.set(11, false);
         break;
     }
 

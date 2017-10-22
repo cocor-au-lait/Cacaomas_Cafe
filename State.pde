@@ -23,13 +23,13 @@ private abstract class State implements Cloneable {
         return state;
     }
     // Stateを開始するメソッド
-    protected final State enter() {
+    protected final void enter() {
         stateFrame = 0;
+        stateTime = 0;
         isActive = true;
         onEnter();
-        return this;
     }
-    protected final void exit() {
+    protected final void exitState() {
         isActive = false;
         onExit();
     }
@@ -60,21 +60,15 @@ private abstract class State implements Cloneable {
         return isActive;
     }
 
-    /*protected final State setLoop(int loopNum, int loopType) {
-        this.loopNum = loopNum;
-        this.loopType = loopType;
-        return this;
-    }*/
-
     protected void checkLoop() {
         if(loopType == LoopType.YOYO && !reverceFlag) {
             back();
             return;
         }
         if(loopCounter == loopNum) {
-            this.exit();
+            exitState();
         }
-        if(loopType == LoopType.RESTART) {
+        if(loopType == LoopType.RESTART || loopType == LoopType.YOYO) {
             replay();
         }
     }
@@ -208,7 +202,7 @@ private class TweenState extends State {
             stateFrame = toFrame(duration);
             checkLoop();
         } else if(stateTime < -loopInterval) {
-            replay();
+            checkLoop();
         }
     }
 
@@ -232,6 +226,9 @@ private class TweenState extends State {
             break;
         case ROTATION:
             firstParam[0] = object.getRotation();
+            break;
+        case COLOR:
+            firstParam[0] = object.getColorB();
             break;
         }
         if(additionalParam) {
@@ -260,6 +257,9 @@ private class TweenState extends State {
             break;
         case ROTATION:
             object.setRotation(firstParam[0] + paramRange[0] * ratio);
+            break;
+        case COLOR:
+            object.setColor(firstParam[0] + paramRange[0] * ratio);
             break;
         }
     }

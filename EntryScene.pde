@@ -1,37 +1,22 @@
 private class EntryScene extends Scene {
     public void run() {
-        // オープニング用
-        final TextObject opTitle = new TextObject("Entry");
-        opTitle.setFont(bickham);
-        opTitle.setAlign(CENTER, CENTER);
-        opTitle.setTextSize(200);
-        opTitle.setPosition(BASE_WIDTH / 2, 350);
-        opTitle.addState("fadeIn", new TweenState(ParameterType.ALPHA)
-            .setTween(0.0f, 1.0f, 300)
-            .setEasing(new EasingOutQuint()));
-        opTitle.addState("zoomIn", new TweenState(ParameterType.SCALE)
-            .setTween(0.3f, 1.0f, 500)
-            .setEasing(new EasingOutBack()));
-        opTitle.addState("fadeOut", new TweenState(ParameterType.ALPHA)
-            .setFreakyTween(0.0f, 300)
-            .setEasing(new EasingInQuint()));
-        opTitle.addState("zoomOut", new TweenState(ParameterType.SCALE)
-            .setFreakyTween(2.0f, 300)
-            .setEasing(new EasingInQuint()));
-
-        final FigureObject opBG = new FigureObject();
-        opBG.setCornerNum(0);
-        opBG.setMode(CENTER);
-        opBG.setColor(color(#FFF7DE));
-        opBG.setPosition(BASE_WIDTH / 2, BASE_HEIGHT / 2);
-        opBG.setSize(BASE_WIDTH * 2, BASE_WIDTH * 2);
-        opBG.addState("fadeOut", new TweenState(ParameterType.ALPHA)
-            .setFreakyTween(0.0f, 300));
-        opBG.addState("fadeIn", new TweenState(ParameterType.ALPHA)
-            .setFreakyTween(1.0f, 300));
-        opBG.addState("zoomIn", new TweenState(ParameterType.SCALE)
-            .setTween(0.0f, 1.0f, 600)
-            .setEasing(new EasingInQuint()));
+        final TextObject titleText = new TextObject("Enrty");
+        titleText.setFont(bickham);
+        titleText.setTextSize(141);
+        titleText.setAlign(CENTER, TOP);
+        titleText.setPosition(BASE_WIDTH / 2, 0);
+        final FigureObject titleTextLine = new FigureObject();
+        titleTextLine.setPosition(80, 120);
+        titleTextLine.setSize(1120, 3);
+        // 説明用オブジェクト
+        final TextObject hint = new TextObject();
+        hint.setText("STARTキーで決定     OPTIONキーでプレーヤー選択画面");
+        hint.setFont(yuGothic);
+        hint.setTextSize(15);
+        hint.setPosition(80, 756);
+        hint.addState("fade", new TweenState(ParameterType.ALPHA)
+            .setTween(0.0f, 1.0f, 200));
+        final GroupObject frame = new GroupObject(titleText, titleTextLine);
 
         // プレーヤーデータ
         final ArrayList<PlayerData> playerData = new ArrayList<PlayerData>();
@@ -51,15 +36,6 @@ private class EntryScene extends Scene {
         pd.setPoint(db.getInt("point"));
         pd.setRank(db.getInt("rank"));
         db.close();
-
-        final TextObject titleText = new TextObject("Enrty");
-        titleText.setFont(bickham);
-        titleText.setTextSize(141);
-        titleText.setAlign(CENTER, TOP);
-        titleText.setPosition(BASE_WIDTH / 2, 0);
-        final FigureObject titleTextLine = new FigureObject();
-        titleTextLine.setPosition(80, 120);
-        titleTextLine.setSize(1120, 3);
 
         final TextObject information = new TextObject("#Player Information");
         information.setFont(appleChancery);
@@ -143,20 +119,7 @@ private class EntryScene extends Scene {
             .setEasing(new EasingOutQuint()));
 
 
-        // 説明用オブジェクト
-        final TextObject hint = new TextObject();
-        hint.setText("STARTキーで決定     OPTIONキーでプレーヤー選択画面");
-        hint.setFont(yuGothic);
-        hint.setTextSize(15);
-        hint.setPosition(80, 756);
-        hint.addState("fade", new TweenState(ParameterType.ALPHA)
-            .setTween(0.0f, 1.0f, 200));
-
-
-        objects = Arrays.asList(titleText, titleTextLine, hint, cardImage,
-            information, itemTexts[0], itemTexts[1], itemTexts[2],
-            itemTextsLine[0], itemTextsLine[1], itemTextsLine[2],
-            playerName, playerRank, playerPoint, playerIcon, opBG, opTitle);
+        addObjects(frame, playerCard, new GroupObject(hint));
 
 
         sequences.put("enterSQ", new Sequence() {
@@ -165,7 +128,7 @@ private class EntryScene extends Scene {
                 switch(keyTime) {
                 case 0:
                     bgScene.startScene("idleSQ");
-                    enableObjects(titleText, titleTextLine);
+                    frame.enableGroup();
                     break;
                 case 600:
                     card.startState("slideIn");
@@ -208,7 +171,7 @@ private class EntryScene extends Scene {
             }
             @Override
             protected void onProcess() {
-                if(inputListener.onPressed(6)) {
+                if(keyListener.isPressed(6)) {
                     changeSequence(sequences.get("cardExitSQ"));
                 }
             }

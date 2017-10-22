@@ -38,6 +38,7 @@ private abstract class Scene implements Runnable {
     }
 
     protected final void startScene(String ... sequenceNames) {
+        cacheObjects();
         for(String sequenceName : sequenceNames) {
             Sequence sequence = sequences.get(sequenceName);
             if(sequence == null) {
@@ -49,36 +50,41 @@ private abstract class Scene implements Runnable {
         isActive = true;
     }
 
-    protected void enableObjects(GameObject ... objects) {
+    protected final void enableObjects(GameObject ... objects) {
         for(GameObject object : objects) {
-            object.enable();
+            object.enableObject();
         }
     }
 
-    protected void enableObjects() {
+    protected final void enableObjects() {
         for(GameObject object : objects) {
-            object.enable();
+            object.enableObject();
         }
     }
 
-    protected void disableObjects(GameObject ... objects) {
+    protected final void disableObjects(GameObject ... objects) {
         for(GameObject object : objects) {
-            object.disable();
+            object.disableObject();
         }
     }
 
-    protected void disableObjects() {
+    protected final void disableObjects() {
         for(GameObject object : objects) {
-            object.disable();
+            object.disableObject();
+        }
+    }
+
+    protected final void addObjects(GroupObject ... groups) {
+        for(GroupObject group : groups) {
+            for(GameObject object : group.getObjects()) {
+                objects.add(object);
+            }
         }
     }
 
     protected final void processScene() {
         if(!isActive) {
             return;
-        }
-        if(!hasCached) {
-            cacheObjects();
         }
         // 各シーンの全オブジェクトに付与されているステートの更新を行う
         for(GameObject object : objects) {
@@ -90,14 +96,14 @@ private abstract class Scene implements Runnable {
         sceneTime = toTime(++sceneFrame);
     }
 
-    private final void cacheObjects() {
+    protected void cacheObjects() {
         for(GameObject object : objects) {
             float tempAlpha = object.getAlpha();
-            object.enable();
+            object.enableObject();
             object.setAlpha(0.0f);
             object.drawObject();
             object.setAlpha(tempAlpha);
-            object.disable();
+            object.disableObject();
             hasCached = true;
         }
     }

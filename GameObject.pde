@@ -6,10 +6,11 @@ private abstract class GameObject implements Cloneable {
     protected float alpha = 1.0f;
     private int blend = BLEND;
     protected color colors;
+    protected float colorH, colorS, colorB;
     protected Map<String, State> states = new HashMap<String, State>();
     //protected ArrayList<State> subStates = new ArrayList<State>();
 
-    /*@Override
+    @Override
     public GameObject clone(){
         GameObject object = new GameObject() {
             @Override protected void concreteDraw() {};
@@ -18,12 +19,15 @@ private abstract class GameObject implements Cloneable {
         try {
             object = (GameObject)super.clone();
             object.states = new HashMap<String, State>(this.states);
+            for(Entry<String, State> entry : object.states.entrySet()) {
+                object.addState(entry.getKey(), entry.getValue());
+            }
            // object.subStates = new ArrayList<State>(this.subStates);
         } catch (Exception e){
             e.printStackTrace();
         }
         return object;
-    }*/
+    }
 
     protected final boolean isActive() {
         return isActive;
@@ -124,8 +128,36 @@ private abstract class GameObject implements Cloneable {
         this.colors = colors;
     }
 
+    protected final void setColor(float colorB) {
+        setColor(0.0f, 0.0f , colorB);
+    }
+
+    protected final void setColor(float colorH, float colorS, float colorB) {
+        float[] colorHSB = {colorH, colorS, colorB};
+        for(float c : colorHSB) {
+            if(c > 100.0f) {
+                c = 100.0f;
+            } else if(c < 0.0f) {
+                c = 100.0f;
+            }
+        }
+        this.colorH = colorHSB[0];
+        this.colorS = colorHSB[1];
+        this.colorB = colorHSB[2];
+        setColor(color(colorHSB[0], colorHSB[1], colorHSB[2]));
+    }
+
     protected final color getColor() {
         return colors;
+    }
+
+    protected final float getColorB() {
+        return colorB;
+    }
+
+    protected final float[] getColorHSB() {
+        float[] colorHSB = {colorH, colorS, colorB};
+        return colorHSB;
     }
 
     protected final void setAlpha(float alpha) {
@@ -161,7 +193,7 @@ private abstract class GameObject implements Cloneable {
         states.put(name, cloneState.setObject(this));
     }
 
-    protected final void enable() {
+    protected final void enableObject() {
         isActive = true;
     }
 
@@ -173,6 +205,16 @@ private abstract class GameObject implements Cloneable {
                 return;
             }
             states.get(name).enter();
+        }
+    }
+
+    protected final void stopState(String ... names) {
+        for(String name : names) {
+            if(states.get(name) == null) {
+                println("Error:No such state");
+                return;
+            }
+            states.get(name).exitState();
         }
     }
 
@@ -201,7 +243,7 @@ private abstract class GameObject implements Cloneable {
         nowState.start();
     }*/
 
-    protected final void disable() {
+    protected final void disableObject() {
         isActive = false;
     }
 
@@ -221,7 +263,7 @@ private abstract class GameObject implements Cloneable {
 }
 
 private class GroupObject implements Cloneable {
-    ArrayList<GameObject> objects;
+    List<GameObject> objects;
 
     private GroupObject(GameObject ... objects) {
         this.objects = new ArrayList<GameObject>(Arrays.asList(objects));
@@ -232,11 +274,9 @@ private class GroupObject implements Cloneable {
         GroupObject group = new GroupObject();
         try {
             group = (GroupObject)super.clone();
-            group.objects = new ArrayList<GameObject>(this.objects);
-            for(GameObject object : group.objects) {
-                for(Entry<String, State> entry : object.states.entrySet()) {
-                    object.addState(entry.getKey(), entry.getValue());
-                }
+            group.objects = new ArrayList<GameObject>();
+            for(GameObject object : this.objects) {
+                group.objects.add(object.clone());
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -244,14 +284,17 @@ private class GroupObject implements Cloneable {
         return group;
     }
 
-    private ArrayList<GameObject> getObjects() {
+    private List<GameObject> getObjects() {
         return objects;
     }
 
     private void jointGroup(GroupObject ... groups) {
+        List<GameObject> temp = new ArrayList<GameObject>(this.objects);
+        objects = new ArrayList<GameObject>();
         for(GroupObject group : groups) {
             this.addObjects(group.getObjects());
         }
+        this.addObjects(temp);
     }
 
     private void addObjects(GameObject ... objects) {
@@ -260,21 +303,21 @@ private class GroupObject implements Cloneable {
         }
     }
 
-    private void addObjects(ArrayList<GameObject> objects) {
+    private void addObjects(List<GameObject> objects) {
         for(GameObject object : objects) {
             this.objects.add(object);
         }
     }
 
-    private void enable() {
+    private void enableGroup() {
         for(GameObject object : objects) {
-            object.enable();
+            object.enableObject();
         }
     }
 
-    private void disable() {
+    private void disableGroup() {
         for(GameObject object : objects) {
-            object.disable();
+            object.disableObject();
         }
     }
 
@@ -287,6 +330,22 @@ private class GroupObject implements Cloneable {
     private void setColor(color colors) {
         for(GameObject object : objects) {
             object.setColor(colors);
+        }
+    }
+
+    protected final void setColor(float colorB) {
+        for(GameObject object : objects) {
+            object.colorB = colorB;
+            object.setColor(color(0.0f, 0.0f , colorB));
+        }
+    }
+
+    protected final void setColor(float colorH, float colorS, float colorB) {
+        for(GameObject object : objects) {
+            object.colorH = colorH;
+            object.colorS = colorS;
+            object.colorB = colorB;
+            object.setColor(color(colorH, colorS, colorB));
         }
     }
 
@@ -341,6 +400,12 @@ private class GroupObject implements Cloneable {
     protected final void startState(String ... names) {
         for(GameObject object : objects) {
             object.startState(names);
+        }
+    }
+
+    protected final void stopState(String ... names) {
+        for(GameObject object : objects) {
+            object.stopState(names);
         }
     }
 }

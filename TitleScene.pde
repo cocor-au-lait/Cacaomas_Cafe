@@ -18,7 +18,7 @@ private class TitleScene extends Scene {
 
         final TextObject mainText = new TextObject("Pless START key to start");
         mainText.setFont(font0);
-        mainText.setColor(color(0));
+        mainText.setColor(color(0.0f));
         mainText.setAlign(CENTER, TOP);
         mainText.setPosition(BASE_WIDTH / 2, 670);
         mainText.setTextSize(35);
@@ -29,7 +29,7 @@ private class TitleScene extends Scene {
         final FigureObject circle = new FigureObject();
         circle.setCornerNum(0);
         circle.setBlend(ADD);
-        circle.setColor(color(40));
+        circle.setColor(color(12.0f));
         circle.setSize(100, 100);
         circle.setMode(CENTER);
         circle.addState("loop", new TweenState(ParameterType.POSITION)
@@ -66,7 +66,7 @@ private class TitleScene extends Scene {
         sequences.put("idleSQ", new Sequence() {
             @Override
             protected void onProcess() {
-                if(inputListener.onPressed(6)) {
+                if(keyListener.isPressed(6)) {
                     //se.play();
                     //bgm.shiftGain(1, -80, 3000);
                     subScene.startScene();
