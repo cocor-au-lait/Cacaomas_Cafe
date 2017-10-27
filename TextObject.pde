@@ -5,6 +5,9 @@ private class TextObject extends GameObject {
     private String string;
     private float textSize;
     private boolean hasSize;
+    private boolean isNumberMode;
+    private NumType numType;
+    private int formatLeft, formatRight;
 
     private TextObject() {
         string = "";
@@ -12,6 +15,25 @@ private class TextObject extends GameObject {
 
     private TextObject(String string) {
         this.string = string;
+    }
+
+    private void numberMode(NumType numType) {
+        numberMode(numType, 0, 0);
+    }
+
+    private void numberMode(NumType numType, int formatLeft) {
+        numberMode(numType, formatLeft, 0);
+    }
+
+    private void numberMode(NumType numType, int formatLeft, int formatRight) {
+        isNumberMode = true;
+        this.numType = numType;
+        this.formatLeft = formatLeft;
+        this.formatRight = formatRight;
+    }
+
+    private void stringMode() {
+        isNumberMode = false;
     }
 
     @Override
@@ -153,7 +175,15 @@ private class TextObject extends GameObject {
         textSize(textSize * scale * DISPLAY_SCALE);
         fill(colors, alpha);
         textAlign(alignX, alignY);
-        if(hasSize) {
+        if(isNumberMode) {
+            switch(numType) {
+            case INTEGER:
+                text(nf((int)number, formatLeft, formatRight), realPosX, realPosY);
+                break;
+            case FLOAT:
+                text(nf(number, formatLeft, formatRight), realPosX, realPosY);
+                break;
+            }
             //text(string, realPosX, realPosY, realSizeX , realSizeY);
         } else {
             text(string, realPosX, realPosY);

@@ -79,6 +79,6 @@ private class TitleScene extends Scene {
     @Override
     protected Scene disposeScene() {
         bgScene.startScene("idleSQ");
-        return new EntryScene();
+        return new MusicSelectScene();
     }
 }

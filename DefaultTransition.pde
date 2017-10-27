@@ -94,6 +94,7 @@ private class DefaultTransition extends Scene {
             @Override
             protected void onProcess() {
                 if(keyTime > 3000 && mainScene.hasLoaded()) {
+                    mainScene.cacheObjects();
                     changeSequence(sequences.get("exitSQ"));
                 }
             }

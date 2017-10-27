@@ -109,7 +109,7 @@ private abstract class Scene implements Runnable {
     }
 
     private final void drawScene() {
-        if(!isActive) {
+        if(!isActive || overFrame == 0) {
             return;
         }
         // オブジェクトを宣言した順に描画を行う

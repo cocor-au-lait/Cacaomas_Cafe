@@ -71,6 +71,7 @@ private class SetupScene extends Scene {
         baoli = createFont("Baoli SC", 100, true);
         yuGothic = createFont("YuGothic", 100, true);
         yuMincho = createFont("YuMincho", 100, true);
+        brushScript = createFont("Brush Script MT", 100, true);
     }
     // シーンを抜ける時の処理
     @Override

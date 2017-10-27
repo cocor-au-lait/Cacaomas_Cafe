@@ -38,6 +38,63 @@ private GroupObject getFrameGroup(String titleText) {
     return group;
 }
 
+private GroupObject getMusicGroup(MusicData data, int diff) {
+    boolean isJapanese = false;
+    TextObject title = new TextObject();
+    title.setText(data.getTitle());
+    title.setFont(isJapanese(data.getTitle()) ? yuMincho : appleChancery);
+    title.setTextSize(30);
+    title.setPosition(172, isJapanese(data.getTitle()) ? 251 : 243);
+    TextObject artist =  new TextObject();
+    artist.setText(data.getArtist());
+    artist.setFont(isJapanese(data.getArtist()) ? yuMincho : appleChancery);
+    artist.setColor(color(#81401E));
+    artist.setTextSize(21);
+    artist.setPosition(172, isJapanese(data.getArtist()) ? 299 : 291);
+    TextObject bpm = new TextObject();
+    bpm.setText(Integer.toString((int)data.getBpm()));
+    bpm.setFont(baoli);
+    bpm.setColor(color(#5F5F5F));
+    bpm.setTextSize(30);
+    bpm.setAlign(RIGHT, TOP);
+    bpm.setPosition(667, 248);
+    TextObject levelB = bpm.clone();
+    levelB.setColor(color(#3787B1));
+    levelB.setText(Integer.toString(data.getLevel().get(0)));
+    levelB.setAlign(CENTER, TOP);
+    levelB.setPosition(597, 287);
+    TextObject levelA = levelB.clone();
+    levelA.setColor(color(#CBA400));
+    levelA.setText(Integer.toString(data.getLevel().get(1)));
+    levelA.setPosition(628, 287);
+    TextObject levelM = levelB.clone();
+    levelM.setColor(color(#BE2D2D));
+    levelM.setText(Integer.toString(data.getLevel().get(2)));
+    levelM.setPosition(659, 287);
+    FigureObject line = new FigureObject();
+    line.setSize(540, 1);
+    line.setPosition(136, 291);
+    FigureObject circle = new FigureObject();
+    circle.setCornerNum(0);
+    circle.setSize(26, 26);
+    circle.setPosition(140, 254);
+    GroupObject group = new GroupObject(title, artist, bpm, levelB, levelA, levelM, line, circle);
+    group.addPosition(0, 97 * diff);
+    group.addState("fadeIn", new TweenState(ParameterType.ALPHA)
+        .setTween(0.0f, 1.0f, 200));
+    return group;
+}
+
+private boolean isJapanese(String str) {
+    for(char c : str.toCharArray()) {
+        if ((c <= '\u007e') || (c == '\u00a5') || (c == '\u203e') || (c >= '\uff61' && c <= '\uff9f')) {
+            continue;
+        }
+        return true;
+    }
+    return false;
+}
+
 /*
 private class FrameCounter {
     private int elapsedFrame;
