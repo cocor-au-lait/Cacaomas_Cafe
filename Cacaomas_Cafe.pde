@@ -15,7 +15,8 @@ import de.bezier.data.sql.*;        // データベース用
 // データベース管理
 private SQLite db;
 // ###加えて各ステートで使うフォントを読み込ませる
-private PFont font0, appleChancery, bickham, ayuthaya, athelas, baoli, yuGothic, yuMincho;
+private PFont font0, appleChancery, bickham, ayuthaya, athelas, baoli, yuGothic,
+    yuMincho, brushScript;
 // 音楽ファイルコア（画面遷移の際にも音が再生できるようにグローバル変数として設定）
 private Minim minim;
 // ポリモーフィズムを利用して各画面を構成
@@ -36,9 +37,9 @@ private FrameTimer frameTimer;
 private int overFrame;
 // デバッグ用平均FPS表示関数
 private FrameRate debugFramerate = new FrameRate(FRAME_RATE);
-private enum NumType {RELATIVE, ABSOLUTE}
 private enum LoopType {RESTART, YOYO, RETURN}
-private enum ParameterType {ALPHA, SCALE, POSITION, SIZE, ROTATION, COLOR}
+private enum NumType {FLOAT, INTEGER}
+private enum ParameterType {ALPHA, SCALE, POSITION, SIZE, ROTATION, COLOR, NUMBER}
 
 private boolean hasLoadedMainScene, hasLoadedBackgroundScene;
 

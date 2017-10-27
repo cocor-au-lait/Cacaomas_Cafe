@@ -7,7 +7,7 @@ private class ModeSelectScene extends Scene {
         final GroupObject frame = getFrameGroup("Mode Select");
         // 説明用オブジェクト
         final TextObject hint = new TextObject();
-        hint.setText("STARTキーで決定     MILLスクラッチでモード選択");
+        hint.setText("STARTキーで決定     MILLスクラッチでモードを選択");
         hint.setFont(yuGothic);
         hint.setTextSize(15);
         hint.setPosition(80, 756);
@@ -15,11 +15,10 @@ private class ModeSelectScene extends Scene {
             .setTween(0.0f, 1.0f, 200));
 
         final ImageObject circleImage2 = new ImageObject("image/parts/circle.png");
-        circleImage2.setSize(309, 309);
-        circleImage2.setPosition(486, 158);
+        circleImage2.setPosition(486, 168);
         final ImageObject coffeeImage2 = new ImageObject("image/parts/mode1.png");
         coffeeImage2.setSize(200, 200);
-        coffeeImage2.setPosition(540, 212);
+        coffeeImage2.setPosition(540, 222);
         final State zoomInIcon = new TweenState(ParameterType.SCALE)
             .setTween(0.0f, 1.0f, 500)
             .setEasing(new EasingOutQuint());
@@ -61,7 +60,7 @@ private class ModeSelectScene extends Scene {
 
         final ImageObject spinnerImage = new ImageObject("image/parts/spinner.png");
         spinnerImage.setSize(340, 340);
-        spinnerImage.setPosition(470, 141);
+        spinnerImage.setPosition(470, 151);
         spinnerImage.addState("fadeIn",  new TweenState(ParameterType.ALPHA)
             .setTween(0.0f, 1.0f, 200));
         spinnerImage.addState("rotate", new TweenState(ParameterType.ROTATION)
@@ -87,11 +86,11 @@ private class ModeSelectScene extends Scene {
         modeTitleText.setFont(appleChancery);
         modeTitleText.setTextSize(95);
         modeTitleText.setAlign(CENTER, TOP);
-        modeTitleText.setPosition(BASE_WIDTH / 2, 477);
+        modeTitleText.setPosition(BASE_WIDTH / 2, 487);
         modeTitleText.addState("enter", new TweenState(ParameterType.ALPHA)
             .setTween(0.0f, 1.0f, 400));
         final FigureObject modeTitleLine = new FigureObject();
-        modeTitleLine.setPosition(332, 611);
+        modeTitleLine.setPosition(332, 621);
         modeTitleLine.addState("enter", new TweenState(ParameterType.SIZE)
             .setTween(0, 3, 616, 3, 400)
             .setEasing(new EasingOutQuint()));
@@ -99,7 +98,7 @@ private class ModeSelectScene extends Scene {
         modeTitleDetail.setFont(yuMincho);
         modeTitleDetail.setTextSize(22);
         modeTitleDetail.setAlign(CENTER, TOP);
-        modeTitleDetail.setPosition(BASE_WIDTH / 2, 649);
+        modeTitleDetail.setPosition(BASE_WIDTH / 2, 659);
         modeTitleDetail.addState("enter", new TweenState(ParameterType.ALPHA)
             .setTween(0.0f, 1.0f, 400));
         final GroupObject modeTitle = new GroupObject(modeTitleText, modeTitleLine, modeTitleDetail);
@@ -221,13 +220,13 @@ private class ModeSelectScene extends Scene {
         modeIcon[selectedNum].startState("popColor", "popScale");
 
         spinner.addState("move", new TweenState(ParameterType.POSITION)
-            .setFreakyTween(pos, 141, 500)
+            .setFreakyTween(pos, 151, 500)
             .setEasing(new EasingOutQuint()));
         spinner.startState("move");
     }
 
     @Override
     protected Scene disposeScene() {
-        return new EntryScene();
+        return new MusicSelectScene();
     }
 }

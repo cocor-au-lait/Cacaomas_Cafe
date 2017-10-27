@@ -1,8 +1,13 @@
 private class SimpleTransition extends Scene {
     private String textString;
+    private boolean decideMode;
 
     private SimpleTransition(String textString) {
         this.textString = textString;
+    }
+
+    private SimpleTransition(boolean decideMode) {
+        this.decideMode = decideMode;
     }
 
     public void run() {
@@ -23,6 +28,9 @@ private class SimpleTransition extends Scene {
         mainText.addState("zoomOut", new TweenState(ParameterType.SCALE)
             .setFreakyTween(2.0f, 300)
             .setEasing(new EasingInQuint()));
+
+        final ImageObject jacket = new ImageObject("image/parts/board1.png");
+        //jacket.set
 
         final FigureObject background = new FigureObject();
         background.setCornerNum(0);
@@ -55,6 +63,9 @@ private class SimpleTransition extends Scene {
                     break;
                 case 300:
                     background3.startState("zoomIn");
+                    if(decideMode) {
+                        changeSequence(sequences.get("decideEnterSQ"));
+                    }
                     break;
                 case 900:
                     disableObjects(background2, background3);
@@ -63,6 +74,17 @@ private class SimpleTransition extends Scene {
                 case 1400:
                     mainScene = mainScene.disposeScene();
                     changeSequence(sequences.get("idleSQ"));
+                    break;
+                }
+            }
+        });
+
+        sequences.put("decideEnterSQ", new Sequence() {
+            @Override
+            protected void onProcess() {
+                switch(keyTime) {
+                case 0:
+                    jacket.startState("fadeIn", "zoomIn");
                     break;
                 }
             }
