@@ -1,0 +1,19 @@
+class HSBColor {
+    float h, s, b;
+
+    HSBColor(float h, float s, float b) {
+        this.h = h;
+        this.s = s;
+        this.b = b;
+    }
+
+    HSBColor(HSBColor origin) {
+        set(origin);
+    }
+
+    void set(HSBColor origin) {
+        this.h = origin.h;
+        this.s = origin.s;
+        this.b = origin.b;
+    }
+}
