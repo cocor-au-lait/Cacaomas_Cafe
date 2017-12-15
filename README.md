@@ -1,8 +1,8 @@
-# タイトル名「Beat Extractor」
-### **「音楽に合わせて美味しいコーヒーを作ろう」**
+## Beat Extractor α - Barista -
+#### **「音楽に合わせて美味しいコーヒーを作ろう」**
 未来のバリスタになるために…  
 ***
-### *戦いは次のステージへ*
+#### *戦いは次のステージへ*
 ##### pureJavaモードによるゲームの完全リニューアル
 ###### → [CacaomasMusic](https://github.com/juncocoa0731/CacaomasMusic "CacaomasMusic")
 ***
